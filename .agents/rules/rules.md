@@ -1,10 +1,36 @@
+---
+trigger: always_on
+---
+
 # DeepWork Project Rules
 
 ## Project Overview
 
-**DeepWork is a full-stack Pomodoro-based focus timer that respects flow states, automates session logging, and gives users data to understand their productivity patterns. Unlike traditional Pomodoro timers that force session transitions, DeepWork uses gentle notifications and tracks accumulated focus time across a day.**
+**DeepWork is a full-stack Pomodoro-based focus timer that respects flow states, automates session logging, and gives users datprettiera to understand their productivity patterns. Unlike traditional Pomodoro timers that force session transitions, DeepWork uses gentle notifications and tracks accumulated focus time across a day.**
 
 **Target users: grad students, software engineers, and remote professionals who need flexible deep work support — validated through three Mom Test interviews (February 2026).**
+
+## Core Principles
+
+1. **High Quality Development:** All code must be production-ready, readable, and strictly adhere to high quality standards.
+2. **Professional Aesthetics:** The UI must adhere to a premium, non-generic look using Tailwind CSS. Avoid standard default looks and prioritize visually striking, highly polished components.
+3. **Test-Driven:** No feature is considered complete without automated tests.
+4. **Collaboration First:** We strictly use Scrum on GitHub Issues and standard feature branch/Pull Request workflows.
+5. **Frequent Commits:** Commit code often to establish valid development checkpoints. Specifically, a commit must be made every time a major feature (or sub-component) is completed.
+
+## Workflow Execution Rules for Agents
+
+- When implementing a feature, ensure a corresponding GitHub Issue exists.
+- **Every time we create a commit, it must reference the GitHub issue that we are currently working on.**
+- Always verify your work via automated tests before notifying the user of completion.
+- **When a feature is properly tested and implemented, you must ask the user if they want to close the issue.**
+- Prioritize non-API dependent tools like local `transformers.js` for ML tasks to ensure low cost and high privacy for the user.
+
+## Stick to the truth
+
+- **Do not feel like you have to please me, I prefer that you say no or contradict me if I'm wrong.**
+- **Feel free to tell me that you don't know something or that you are not confident instead of making up stuff.**
+- **Always base your answers on evidence, unless I tell you otherwise**
 
 ## Tech Stack
 
@@ -14,43 +40,8 @@
 - **Database**: MongoDB (Atlas free tier), Mongoose ODM
 - **Auth**: JWT (HTTP-only, Secure, SameSite=Strict cookies) + bcrypt
 - **Deployment**: Vercel
-- **Testing**: Vitest, React Testing Library, Supertest
+- **Testing**: Vitest, React Testing Library, Supertest, Playwright
 
-## Architecture
-
-```
-┌─────────────┐       ┌───────────────────┐       ┌────────────────┐
-│  React UI   │──────▶│  /api/v1/* routes  │──────▶│  MongoDB Atlas │
-│  (Next.js)  │◀──────│  (App Router)     │◀──────│  (Free Tier)   │
-└─────────────┘ JSON  └───────────────────┘       └────────────────┘
-                         ▲ JWT in HTTP-only cookie
-```
-
-### Backend Pattern
-
-**API routes follow a flat, pragmatic pattern — NOT the Repository → Service → Controller layering:**
-
-```
-Route Handler → Service/Util → Mongoose Model → MongoDB
-```
-
-- **Route handlers** (`app/api/v1/*/route.ts`): Parse request, validate input, call service functions, return `NextResponse`. Each handler includes auth verification.
-- **Services** (`lib/services/*.ts`): Business logic as plain exported functions. Receive parsed data, return results or throw errors. No classes, no DI — just functions.
-- **Models** (`lib/models/*.ts`): Mongoose schemas and models. Data shape and validation only.
-- **Middleware** (`lib/middleware/*.ts`): Auth verification, error formatting. Used by route handlers, not as Express-style middleware chain.
-
-### Frontend Pattern
-
-- **Pages** (`app/*/page.tsx`): Four routes — `/` (timer), `/analytics`, `/auth/login`, `/auth/register`.
-- **Components** (`components/*.tsx`): Pure presentational — `CircularTimer`, `AccumulatedBar`, `SessionTag`, `BreakSuggestion`, notification toast, `Settings` modal.
-- **Hooks** (`hooks/*.ts`): Timer state (`useTimer`), auth state, accumulated focus tracking.
-- **Context** (`contexts/*.tsx`): User data and settings loaded on mount, shared via React context.
-
-**Timer countdown is entirely client-side. The server is only contacted:**
-
-1. **On page load (hydrate settings + today's accumulated focus)**
-2. **On session completion (persist session)**
-3. **On analytics navigation (fetch aggregated history)**
 
 ## Coding Rules
 
@@ -100,6 +91,11 @@ Route Handler → Service/Util → Mongoose Model → MongoDB
 - **Timer countdown is entirely client-side (hooks) — server is never contacted during ticking**
 - **Optimistic updates after session completion: update local state immediately, POST in background**
 
+## Code Quality
+
+- **Formatting & Linting:** You must adhere to ESLint and Prettier formatting standard rules. Code that does not pass linting cannot be merged.
+- **Code Coverage Minimum:** `70%` code coverage is strictly enforced.
+
 ## Testing Rules
 
 ### Philosophy: TDD with Testing Trophy
@@ -112,7 +108,8 @@ Route Handler → Service/Util → Mongoose Model → MongoDB
 
 - **API integration tests (primary)**: Use Supertest to test full HTTP request → response cycles against Next.js API routes. Test with a real test database. These are the tests that matter.
 - **Component tests (secondary)**: Use React Testing Library to test user-facing behavior — render component, simulate interaction, assert on DOM output. Do NOT test implementation details (state values, hook internals).
-- **Unit tests (only for pure logic)**: Timer calculations, accumulated focus threshold logic, tag normalization, duration formatting. Nothing else.
+- **Unit Testing**: Write robust unit tests (using Vitest) for logic and individual components.
+- **End-to-End Testing**: Use **Playwright** to map and verify the user journey across the core usage scenarios.
 - **Do NOT write**: Unit tests for route handlers, services, or models. Do not mock Mongoose. Do not test implementation details.
 
 ### Test Structure
@@ -134,9 +131,9 @@ Route Handler → Service/Util → Mongoose Model → MongoDB
 
 ### CRITICAL RULE: Test files are read-only during implementation
 
-**When implementing features (making tests pass), NEVER modify test files in **`__tests__/`.\*\*
+**When implementing features (making tests pass), NEVER modify test files in **`__tests__/`.**
 **If a test fails, fix the implementation code, NOT the test.**
-\*\*The ONLY exception: import path changes due to file restructuring.
+**The ONLY exception: import path changes due to file restructuring.**
 
 ## Workflow
 
@@ -170,20 +167,20 @@ Route Handler → Service/Util → Mongoose Model → MongoDB
 
 ## Commands
 
-```
+```bash
 # Development
-npm run dev                    # Start Next.js dev server
-npm run build                  # Production build
-npm run lint                   # ESLint
+npm run dev                    # Start Next.js dev server
+npm run build                  # Production build
+npm run lint                   # ESLint
 
 # Database
 # MongoDB Atlas — no local migration commands. Use Mongoose schemas as source of truth.
 
 # Testing
-npx vitest run                 # Run all tests once
-npx vitest run --reporter=verbose  # Verbose output
-npx vitest run __tests__/integration/sessions.test.ts  # Run specific file
-npx vitest --coverage          # Run with coverage report
+npx vitest run                 # Run all tests once
+npx vitest run --reporter=verbose  # Verbose output
+npx vitest run __tests__/integration/sessions.test.ts  # Run specific file
+npx vitest --coverage          # Run with coverage report
 ```
 
 ## Design References
