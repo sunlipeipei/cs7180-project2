@@ -13,7 +13,7 @@ trigger: always_on
 ## Core Principles
 
 1. **High Quality Development:** All code must be production-ready, readable, and strictly adhere to high quality standards.
-2. **Professional Aesthetics:** The UI must adhere to a premium, non-generic look using Tailwind CSS. Avoid standard default looks and prioritize visually striking, highly polished components.
+2. **Professional Aesthetics:** The UI must adhere to a premium, non-generic look using Tailwind CSS. **CRITICAL AESTHETIC RULE:** While you must use Tailwind CSS as the primary styling method, you MUST perfectly match the exact visual design defined in `project_memory/deepwork_prototype.jsx`. This means extending `tailwind.config.ts` to include the specific custom colors (e.g., `#c8843a`), fonts (_Playfair Display_, _JetBrains Mono_, _Lato_), and translating any custom CSS features (like the SVG grain overlay `<feTurbulence>`, complex soft glows `<feGaussianBlur>`, and custom animations like `pulse-ring`) into Tailwind classes or custom global CSS. Do NOT default to generic Tailwind colors or fonts if they conflict with the prototype.
 3. **Test-Driven:** No feature is considered complete without automated tests.
 4. **Collaboration First:** We strictly use Scrum on GitHub Issues and standard feature branch/Pull Request workflows.
 5. **Frequent Commits:** Commit code often to establish valid development checkpoints. Specifically, a commit must be made every time a major feature (or sub-component) is completed.
@@ -41,7 +41,6 @@ trigger: always_on
 - **Auth**: JWT (HTTP-only, Secure, SameSite=Strict cookies) + bcrypt
 - **Deployment**: Vercel
 - **Testing**: Vitest, React Testing Library, Supertest, Playwright
-
 
 ## Coding Rules
 
@@ -90,6 +89,7 @@ trigger: always_on
 
 - **Timer countdown is entirely client-side (hooks) — server is never contacted during ticking**
 - **Optimistic updates after session completion: update local state immediately, POST in background**
+- **Absolute Visual Fidelity:** The frontend build MUST perfectly replicate the aesthetics of `deepwork_prototype.jsx`. If a Tailwind utility class cannot achieve a specific complex style (like a stacked box-shadow, a specific SVG filter, or a grain overlay), you must use custom CSS. The final result must look indistinguishable from the prototype screenshot, not a generic approximation.
 
 ## Code Quality
 
@@ -131,9 +131,11 @@ trigger: always_on
 
 ### CRITICAL RULE: Test files are read-only during implementation
 
-**When implementing features (making tests pass), NEVER modify test files in **`__tests__/`.**
+**When implementing features (making tests pass), NEVER modify test files in `__tests__/`.**
 **If a test fails, fix the implementation code, NOT the test.**
 **The ONLY exception: import path changes due to file restructuring.**
+
+**UI Implementation Exception During Testing:** When executing the "Code Chat" phase to make tests pass, you must STILL fulfill the aesthetic requirements of the prototype. Passing the functional tests is required, but delivering a UI that visually matches `project_memory/deepwork_prototype.jsx` is equally mandatory, even if the tests do not assert aesthetic values.
 
 ## Workflow
 
@@ -148,8 +150,8 @@ trigger: always_on
 
 ### Chat 2 — Code Chat
 
-- **Implements the feature to make all existing tests pass**
-- **Follows all rules in this CLAUDE.md**
+- **Implements the feature to make all existing tests pass while simultaneously ensuring the UI 100% matches the bespoke aesthetic from the prototype.**
+- **Follows all rules in `rules.md`**
 - **Does NOT modify any files in **`__tests__/`
 - **Runs **`npx vitest run` to confirm all tests PASS before committing
 
