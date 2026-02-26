@@ -6,7 +6,7 @@ trigger: always_on
 
 ## Project Overview
 
-**DeepWork is a full-stack Pomodoro-based focus timer that respects flow states, automates session logging, and gives users datprettiera to understand their productivity patterns. Unlike traditional Pomodoro timers that force session transitions, DeepWork uses gentle notifications and tracks accumulated focus time across a day.**
+**DeepWork is a full-stack Pomodoro-based focus timer that respects flow states, automates session logging, and gives users data to understand their productivity patterns. Unlike traditional Pomodoro timers that force session transitions, DeepWork uses gentle notifications and tracks accumulated focus time across a day.**
 
 **Target users: grad students, software engineers, and remote professionals who need flexible deep work support — validated through three Mom Test interviews (February 2026).**
 
