@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { Play, Pause, RefreshCw, Coffee, Briefcase } from "lucide-react";
 
