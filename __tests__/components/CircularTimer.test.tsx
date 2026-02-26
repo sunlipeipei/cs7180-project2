@@ -43,11 +43,25 @@ describe("CircularTimer", () => {
     expect(screen.getByText("24:58")).toBeInTheDocument();
   });
 
-  it("allows user to customize focus duration", () => {
-    render(<CircularTimer defaultFocusMinutes={50} />);
+  it("allows user to customize work and break durations before starting via inputs", () => {
+    render(<CircularTimer />);
+
+    // Assert there are settings/inputs to customize the durations
+    const focusInput = screen.getByLabelText(/focus duration/i);
+    const breakInput = screen.getByLabelText(/break duration/i);
+
+    // Change focus duration to 50
+    fireEvent.change(focusInput, { target: { value: "50" } });
     expect(screen.getByText("50:00")).toBeInTheDocument();
 
-    // Test custom duration props via user input if exposed, but for now test the prop works
+    // Change break duration to 15
+    fireEvent.change(breakInput, { target: { value: "15" } });
+
+    // Switch to break mode to see the updated break time
+    const breakModeBtn = screen.getByRole("button", { name: /break/i });
+    fireEvent.click(breakModeBtn);
+
+    expect(screen.getByText("15:00")).toBeInTheDocument();
   });
 
   it("allows manual switching between focus and break modes", () => {
