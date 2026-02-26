@@ -20,33 +20,29 @@ Next.js serves both the frontend and a versioned public API as a single deployab
 
 ---
 
-## Backend Pattern
+## Frontend Structure
 
-**API routes follow a flat, pragmatic pattern — NOT the Repository → Service → Controller layering:**
+The existing frontend components get decomposed into App Router pages and shared modules.
 
-```
-Route Handler → Service/Util → Mongoose Model → MongoDB
-```
+**Pages.** Four routes: `/` (timer, the post-login default), `/analytics` (session history dashboard), `/auth/login`, and `/auth/register`. A shared layout wraps authenticated routes with the top nav bar and handles the initial settings/accumulated-focus fetch.
 
-- **Route handlers** (`app/api/v1/*/route.ts`): Parse request, validate input, call service functions, return `NextResponse`. Each handler includes auth verification.
-- **Services** (`lib/services/*.ts`): Business logic as plain exported functions. Receive parsed data, return results or throw errors. No classes, no DI — just functions.
-- **Models** (`lib/models/*.ts`): Mongoose schemas and models. Data shape and validation only.
-- **Middleware** (`lib/middleware/*.ts`): Auth verification, error formatting. Used by route handlers, not as Express-style middleware chain.
+**Components.** `CircularTimer`, `AccumulatedBar`, `SessionTag`, `BreakSuggestion`, and the notification toast are pure presentational components in a shared directory. `Settings` remains a modal overlay but reads/writes via the API.
 
-## Frontend Pattern
+**State.** Timer state (running, secondsLeft, mode) stays in client-side hooks. User data and settings come from the server on load and live in React context. Session completion triggers a POST then an optimistic local update.
 
-- **Pages** (`app/*/page.tsx`): Four routes — `/` (timer), `/analytics`, `/auth/login`, `/auth/register`.
-- **Components** (`components/*.tsx`): Pure presentational — `CircularTimer`, `AccumulatedBar`, `SessionTag`, `BreakSuggestion`, notification toast, `Settings` modal.
-- **Hooks** (`hooks/*.ts`): Timer state (`useTimer`), auth state, accumulated focus tracking.
-- **Context** (`contexts/*.tsx`): User data and settings loaded on mount, shared via React context.
+---
 
-**Timer countdown is entirely client-side. The server is only contacted:**
+## Backend Structure
 
-1. **On page load (hydrate settings + today's accumulated focus)**
-2. **On session completion (persist session)**
-3. **On analytics navigation (fetch aggregated history)**
+Four route groups under `/app/api/v1/`, versioned for public API compliance with the rubric.
 
+**Auth** — Registration, login, token refresh. The only unprotected group. Returns JWTs in HTTP-only cookies.
 
+**Sessions** — Create a session on completion; read today's sessions (for accumulated focus) or a date range (for analytics). All queries are scoped to the authenticated user.
+
+**Settings** — Read/patch per-user preferences (work duration, break durations, threshold). Thin layer over the embedded settings in the Users document.
+
+**Analytics** — Pre-aggregated summaries: focus time per tag, daily totals (7/30 days), average session length. Uses MongoDB aggregation pipelines so the client receives computed results, not raw session arrays.
 ---
 
 ## Database Design
