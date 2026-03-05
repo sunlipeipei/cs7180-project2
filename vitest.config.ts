@@ -6,7 +6,10 @@ export default defineConfig({
     plugins: [react()],
     test: {
         environment: 'happy-dom',
-        setupFiles: ['./__tests__/setup.ts'],
+        globalSetup: ['./src/test-utils/global-setup.ts'],
+        setupFiles: ['./__tests__/setup.ts', './src/test-utils/fetch-mock.ts'],
+        hookTimeout: 60000,
+        fileParallelism: false,
         globals: true,
         coverage: {
             provider: 'v8',

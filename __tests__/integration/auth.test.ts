@@ -7,7 +7,7 @@ import React from 'react';
 
 // Mock next/navigation for UI tests
 vi.mock('next/navigation', () => ({
-    useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+    useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })),
     redirect: vi.fn(),
 }));
 
