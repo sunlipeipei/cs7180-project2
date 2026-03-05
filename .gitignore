@@ -38,3 +38,7 @@ next-env.d.ts
 
 # Coverage
 coverage/
+
+# Claude Code local config
+.claude/
+tsconfig.tsbuildinfo
