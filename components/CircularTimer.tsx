@@ -58,8 +58,6 @@ export default function CircularTimer({
     // Visual gentle notification or external callback
     if (onComplete) {
       onComplete(mode);
-    } else {
-      console.log(`Session Complete: ${mode}`);
     }
   }, [mode, onComplete]);
 
@@ -246,7 +244,7 @@ export default function CircularTimer({
             className={`px-8 py-3 rounded-md font-mono text-[12px] tracking-[0.16em] cursor-pointer transition-all border ${
               isActive
                 ? "bg-transparent border-amber text-amber"
-                : `bg-${mode === "focus" ? "amber" : "green"} border-${mode === "focus" ? "amber" : "green"} text-[#1a1208] hover:bg-transparent hover:text-${mode === "focus" ? "amber" : "green"}`
+                : "text-[#1a1208]"
             }`}
             style={
               !isActive
@@ -309,6 +307,7 @@ export default function CircularTimer({
             <input
               id="focus-input"
               type="number"
+              min={1}
               className="bg-bg3 border border-border rounded px-3 py-2 text-text font-mono text-sm outline-none focus:border-amber transition-colors"
               value={focusMins}
               onChange={(e) => {
@@ -328,6 +327,7 @@ export default function CircularTimer({
             <input
               id="break-input"
               type="number"
+              min={1}
               className="bg-bg3 border border-border rounded px-3 py-2 text-text font-mono text-sm outline-none focus:border-green transition-colors"
               value={breakMins}
               onChange={(e) => {
