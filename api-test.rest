@@ -1,0 +1,152 @@
+### -------------------------------------------------------
+### Auth: Register User A
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "usera@example.com",
+  "password": "Test1234!"
+}
+
+### -------------------------------------------------------
+### Auth: Login User A (copy token from Set-Cookie header)
+### -------------------------------------------------------
+
+# @name loginA
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "usera@example.com",
+  "password": "Test1234!"
+}
+
+### -------------------------------------------------------
+### POST session — valid focus (expect 201)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginA.response.headers.set-cookie}}
+
+{
+  "duration": 1500,
+  "mode": "focus"
+}
+
+### -------------------------------------------------------
+### POST session — valid shortBreak (expect 201)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginA.response.headers.set-cookie}}
+
+{
+  "duration": 300,
+  "mode": "shortBreak"
+}
+
+### -------------------------------------------------------
+### GET sessions for User A (expect 200, array with 2 sessions)
+### -------------------------------------------------------
+
+GET http://localhost:3000/api/v1/sessions
+Cookie: {{loginA.response.headers.set-cookie}}
+
+### -------------------------------------------------------
+### POST session — no auth (expect 401)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+
+{
+  "duration": 1500,
+  "mode": "focus"
+}
+
+### -------------------------------------------------------
+### POST session — missing duration (expect 400)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginA.response.headers.set-cookie}}
+
+{
+  "mode": "focus"
+}
+
+### -------------------------------------------------------
+### POST session — zero duration (expect 400)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginA.response.headers.set-cookie}}
+
+{
+  "duration": 0,
+  "mode": "focus"
+}
+
+### -------------------------------------------------------
+### POST session — invalid mode (expect 400)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginA.response.headers.set-cookie}}
+
+{
+  "duration": 300,
+  "mode": "nap"
+}
+
+### -------------------------------------------------------
+### User isolation: Register User B
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "userb@example.com",
+  "password": "Test1234!"
+}
+
+### -------------------------------------------------------
+### User isolation: Login User B
+### -------------------------------------------------------
+
+# @name loginB
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "userb@example.com",
+  "password": "Test1234!"
+}
+
+### -------------------------------------------------------
+### POST session as User B (expect 201)
+### -------------------------------------------------------
+
+POST http://localhost:3000/api/v1/sessions
+Content-Type: application/json
+Cookie: {{loginB.response.headers.set-cookie}}
+
+{
+  "duration": 600,
+  "mode": "longBreak"
+}
+
+### -------------------------------------------------------
+### GET sessions as User B (expect only User B's session)
+### -------------------------------------------------------
+
+GET http://localhost:3000/api/v1/sessions
+Cookie: {{loginB.response.headers.set-cookie}}
