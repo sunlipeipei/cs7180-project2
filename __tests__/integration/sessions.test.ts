@@ -100,7 +100,7 @@ describe('Sessions API', () => {
                 .set('Cookie', cookie);
 
             expect(getRes.status).toBe(200);
-            expect(getRes.body.sessions).toEqual(
+            expect(getRes.body.data).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({ duration: 1500, mode: 'shortBreak' }),
                 ]),
@@ -126,10 +126,10 @@ describe('Sessions API', () => {
                 .set('Cookie', cookie);
 
             expect(res.status).toBe(200);
-            expect(Array.isArray(res.body.sessions)).toBe(true);
-            expect(res.body.sessions.length).toBeGreaterThanOrEqual(1);
+            expect(Array.isArray(res.body.data)).toBe(true);
+            expect(res.body.data.length).toBeGreaterThanOrEqual(1);
 
-            const session = res.body.sessions[0];
+            const session = res.body.data[0];
             expect(session).toHaveProperty('duration', 600);
             expect(session).toHaveProperty('mode', 'longBreak');
             expect(session).toHaveProperty('createdAt');
@@ -154,9 +154,9 @@ describe('Sessions API', () => {
                 .set('Cookie', cookieB);
 
             expect(resB.status).toBe(200);
-            const modes = resB.body.sessions.map((s: { mode: string }) => s.mode);
+            const modes = resB.body.data.map((s: { mode: string }) => s.mode);
             expect(modes).not.toContain('focus');
-            expect(resB.body.sessions).toEqual(
+            expect(resB.body.data).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({ duration: 300, mode: 'shortBreak' }),
                 ]),

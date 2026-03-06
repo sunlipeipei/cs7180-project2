@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === 'GET') {
         const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
-        const limit = Math.max(1, parseInt(String(req.query.limit ?? '20'), 10) || 20);
+        const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '20'), 10) || 20));
         const skip = (page - 1) * limit;
 
         const total = await Session.countDocuments({ userId: payload.sub });
@@ -29,7 +29,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(200).json({
             data,
-            sessions: data,          // backward compat: sessions.test.ts checks res.body.sessions
             pagination: { page, limit, total, totalPages },
         });
     }

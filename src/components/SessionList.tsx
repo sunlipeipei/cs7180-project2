@@ -8,19 +8,36 @@ export default function SessionList() {
     const [sessions, setSessions] = useState<Session[]>([]);
     const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 0 });
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
+        setError(false);
         fetch(`/api/v1/sessions?page=${page}&limit=20`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('fetch failed');
+                return res.json();
+            })
             .then(body => {
                 setSessions(body.data ?? []);
                 setPagination(body.pagination);
+            })
+            .catch(() => {
+                setError(true);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }, [page]);
 
     return (
         <div>
-            {sessions.length === 0 ? (
+            {loading ? (
+                <p>Loading...</p>
+            ) : error ? (
+                <p>Failed to load sessions.</p>
+            ) : sessions.length === 0 ? (
                 <p>No sessions</p>
             ) : (
                 <ul>
