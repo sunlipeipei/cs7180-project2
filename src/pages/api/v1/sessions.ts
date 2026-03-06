@@ -15,8 +15,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await dbConnect();
 
     if (req.method === 'GET') {
-        const sessions = await Session.find({ userId: payload.sub }).sort({ createdAt: -1 }).lean();
-        return res.status(200).json({ sessions });
+        const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+        const limit = Math.max(1, parseInt(String(req.query.limit ?? '20'), 10) || 20);
+        const skip = (page - 1) * limit;
+
+        const total = await Session.countDocuments({ userId: payload.sub });
+        const totalPages = Math.ceil(total / limit);
+        const data = await Session.find({ userId: payload.sub })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        return res.status(200).json({
+            data,
+            sessions: data,          // backward compat: sessions.test.ts checks res.body.sessions
+            pagination: { page, limit, total, totalPages },
+        });
     }
 
     if (req.method === 'POST') {
