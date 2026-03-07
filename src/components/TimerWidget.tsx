@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTimer, TimerSettings, TimerMode } from '@/hooks/useTimer';
 import { CircularTimer } from '@/components/CircularTimer';
 import { AccumulatedBar } from '@/components/AccumulatedBar';
+import { BreakSuggestion, randomSuggestion } from '@/components/BreakSuggestion';
 
 const fmt = (s: number) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -32,6 +33,7 @@ export function TimerWidget() {
 
     const [accMinutes, setAccMinutes] = useState(0);
     const [notification, setNotification] = useState<string | null>(null);
+    const [breakSuggestion, setBreakSuggestion] = useState<string | null>(null);
 
     const fetchAccumulated = () => {
         fetch('/api/v1/accumulated')
@@ -92,6 +94,7 @@ export function TimerWidget() {
     const handleSessionEnd = (completedMode: TimerMode) => {
         if (completedMode === 'focus') {
             notify('Session complete. Take a break when you are ready.');
+            setBreakSuggestion(randomSuggestion());
 
             // Persist the focus session, then refresh accumulated total from server
             fetch('/api/v1/sessions', {
@@ -108,6 +111,7 @@ export function TimerWidget() {
 
         } else {
             notify('Break over. Ready to focus?');
+            setBreakSuggestion(null); // auto-dismiss when break ends
 
             // After a long break, reset accumulated so short breaks are available again
             if (completedMode === 'longBreak') {
@@ -298,6 +302,15 @@ export function TimerWidget() {
                 <div className="w-full max-w-[360px]">
                     <AccumulatedBar minutes={accMinutes} threshold={settings.accThreshold} />
                 </div>
+            )}
+
+            {/* Break suggestion card */}
+            {breakSuggestion && (
+                <BreakSuggestion
+                    suggestion={breakSuggestion}
+                    onDismiss={() => setBreakSuggestion(null)}
+                    onRefresh={() => setBreakSuggestion(randomSuggestion())}
+                />
             )}
 
             {/* Tag autocomplete input */}
