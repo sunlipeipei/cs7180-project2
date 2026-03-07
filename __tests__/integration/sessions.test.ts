@@ -46,6 +46,22 @@ describe('Sessions API', () => {
             expect(res.body.session).toHaveProperty('createdAt');
         });
 
+        it('should return 201 and persist session with an optional tag', async () => {
+            const cookie = await authAs(server, 'sess-createtag@example.com');
+
+            const res = await request(server)
+                .post('/api/v1/sessions')
+                .set('Cookie', cookie)
+                .send({ duration: 1500, mode: 'focus', tag: 'Client A - Report' });
+
+            expect(res.status).toBe(201);
+            expect(res.body.session).toMatchObject({
+                duration: 1500,
+                mode: 'focus',
+                tag: 'Client A - Report'
+            });
+        });
+
         it('should return 401 when no JWT cookie is present', async () => {
             const res = await request(server)
                 .post('/api/v1/sessions')

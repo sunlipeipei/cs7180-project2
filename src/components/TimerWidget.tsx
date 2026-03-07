@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTimer, TimerSettings, TimerMode } from '@/hooks/useTimer';
 import { CircularTimer } from '@/components/CircularTimer';
 
@@ -19,10 +19,36 @@ export function TimerWidget() {
     });
 
     const [showSettings, setShowSettings] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [sessionTag, setSessionTag] = useState('');
+    const [tagSuggestions, setTagSuggestions] = useState<{ _id: string, count: number }[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // Create a ref for the dropdown to handle outside clicks
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
     const [accMinutes, setAccMinutes] = useState(0);
     const [notification, setNotification] = useState<string | null>(null);
+
+    // Fetch tags on mount
+    useEffect(() => {
+        fetch('/api/v1/tags')
+            .then(res => res.json())
+            .then(data => {
+                if (data.tags) setTagSuggestions(data.tags);
+            })
+            .catch(err => console.error('Failed to load tags:', err));
+    }, []);
+
+    // Handle clicks outside the dropdown to close it
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const notify = (msg: string, duration = 4000) => {
         setNotification(msg);
@@ -33,8 +59,34 @@ export function TimerWidget() {
         if (completedMode === 'focus') {
             setAccMinutes(prev => prev + settings.workMinutes);
             notify('Session complete. Take a break when you are ready.');
+
+            // Persist the focus session
+            fetch('/api/v1/sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    duration: settings.workMinutes * 60,
+                    mode: 'focus',
+                    tag: sessionTag
+                })
+            }).catch(err => console.error('Failed to save session:', err));
+
         } else {
             notify('Break over. Ready to focus?');
+
+            // Persist the break session
+            const duration = completedMode === 'shortBreak'
+                ? settings.shortBreakMinutes * 60
+                : settings.longBreakMinutes * 60;
+
+            fetch('/api/v1/sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    duration,
+                    mode: completedMode
+                })
+            }).catch(err => console.error('Failed to save session:', err));
         }
     };
 
@@ -114,7 +166,9 @@ export function TimerWidget() {
                 </button>
             </div>
 
-            <div className="relative flex items-center justify-center">
+
+
+            <div className="relative flex items-center justify-center -mt-4">
                 <CircularTimer
                     progress={progress}
                     radius={140}
@@ -137,8 +191,8 @@ export function TimerWidget() {
                 <button
                     onClick={toggleTimer}
                     className={`px-8 py-3 rounded-md font-mono text-xs tracking-widest border transition-all ${mode !== 'focus'
-                            ? 'border-[#6a9a6a] text-[#1a1208] bg-[#6a9a6a]'
-                            : 'border-[#c8843a] text-[#1a1208] bg-[#c8843a]'
+                        ? 'border-[#6a9a6a] text-[#1a1208] bg-[#6a9a6a]'
+                        : 'border-[#c8843a] text-[#1a1208] bg-[#c8843a]'
                         } hover:bg-transparent hover:text-white`}
                 >
                     {running ? 'PAUSE' : 'START'}
@@ -152,13 +206,56 @@ export function TimerWidget() {
                 <button
                     onClick={toggleFocusBreak}
                     className={`px-8 py-3 rounded-md font-mono text-xs tracking-widest border transition-all ${mode !== 'focus'
-                            ? 'bg-[#1a2e1a] border-[#6a9a6a] text-[#9ab09a]'
-                            : 'border-[#2e2b25] text-[#7a7060] hover:text-[#9ab09a]'
+                        ? 'bg-[#1a2e1a] border-[#6a9a6a] text-[#9ab09a]'
+                        : 'border-[#2e2b25] text-[#7a7060] hover:text-[#9ab09a]'
                         }`}
                 >
                     {mode === 'focus' ? 'BREAK' : 'FOCUS'}
                 </button>
             </div>
+
+            {/* Tag autocomplete input */}
+            {mode === 'focus' && (
+                <div className="relative w-full max-w-[320px] z-10" ref={dropdownRef}>
+                    <div className="flex items-center gap-2 bg-[#222019] border border-[#2e2b25] rounded-md px-3 py-2">
+                        <span className="text-[#7a7060] text-xs">⬡</span>
+                        <input
+                            type="text"
+                            placeholder="Tag this session…"
+                            value={sessionTag}
+                            onChange={(e) => {
+                                setSessionTag(e.target.value);
+                                setShowSuggestions(true);
+                            }}
+                            onFocus={() => setShowSuggestions(true)}
+                            disabled={running}
+                            className={`w-full bg-transparent border-none outline-none font-sans text-[13px] text-[#e8e0d0] tracking-[0.02em] transition-colors
+                                placeholder:text-[#5a5040] ${running ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                    </div>
+
+                    {showSuggestions && !running && (
+                        <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-[#1c1916] border border-[#2e2b25] rounded-md overflow-hidden z-10 shadow-xl">
+                            {tagSuggestions
+                                .filter(t => t._id.toLowerCase().includes(sessionTag.toLowerCase()) && t._id !== sessionTag)
+                                .slice(0, 5)
+                                .map(tag => (
+                                    <button
+                                        key={tag._id}
+                                        className="w-full text-left px-3 py-2 font-sans text-[13px] text-[#7a7060] hover:bg-[#222019] transition-colors flex justify-between cursor-pointer"
+                                        onClick={() => {
+                                            setSessionTag(tag._id);
+                                            setShowSuggestions(false);
+                                        }}
+                                    >
+                                        <span className="truncate">{tag._id}</span>
+                                    </button>
+                                ))
+                            }
+                        </div>
+                    )}
+                </div>
+            )}
 
         </div>
     );
