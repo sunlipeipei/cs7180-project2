@@ -109,6 +109,11 @@ export function TimerWidget() {
         } else {
             notify('Break over. Ready to focus?');
 
+            // After a long break, reset accumulated so short breaks are available again
+            if (completedMode === 'longBreak') {
+                setAccMinutes(0);
+            }
+
             // Persist the break session
             const duration = completedMode === 'shortBreak'
                 ? settings.shortBreakMinutes * 60
