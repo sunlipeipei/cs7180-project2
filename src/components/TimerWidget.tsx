@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTimer, TimerSettings, TimerMode } from '@/hooks/useTimer';
 import { CircularTimer } from '@/components/CircularTimer';
+import { AccumulatedBar } from '@/components/AccumulatedBar';
 
 const fmt = (s: number) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -32,7 +33,14 @@ export function TimerWidget() {
     const [accMinutes, setAccMinutes] = useState(0);
     const [notification, setNotification] = useState<string | null>(null);
 
-    // Fetch user and tags on mount
+    const fetchAccumulated = () => {
+        fetch('/api/v1/accumulated')
+            .then(res => { if (res.ok) return res.json(); return null; })
+            .then(data => { if (data?.data?.minutes !== undefined) setAccMinutes(data.data.minutes); })
+            .catch(err => console.error('Failed to fetch accumulated:', err));
+    };
+
+    // Fetch user, tags, and accumulated on mount
     useEffect(() => {
         fetch('/api/v1/auth/me')
             .then(res => {
@@ -40,7 +48,10 @@ export function TimerWidget() {
                 return null;
             })
             .then(data => {
-                if (data && data.data) setUser(data.data);
+                if (data && data.data) {
+                    setUser(data.data);
+                    fetchAccumulated(); // only makes sense if logged in
+                }
             })
             .catch(err => console.error('Failed to get user:', err));
 
@@ -80,10 +91,9 @@ export function TimerWidget() {
 
     const handleSessionEnd = (completedMode: TimerMode) => {
         if (completedMode === 'focus') {
-            setAccMinutes(prev => prev + settings.workMinutes);
             notify('Session complete. Take a break when you are ready.');
 
-            // Persist the focus session
+            // Persist the focus session, then refresh accumulated total from server
             fetch('/api/v1/sessions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -92,7 +102,9 @@ export function TimerWidget() {
                     mode: 'focus',
                     tag: sessionTag
                 })
-            }).catch(err => console.error('Failed to save session:', err));
+            })
+                .then(() => fetchAccumulated())
+                .catch(err => console.error('Failed to save session:', err));
 
         } else {
             notify('Break over. Ready to focus?');
@@ -275,6 +287,13 @@ export function TimerWidget() {
                     {mode === 'focus' ? 'BREAK' : 'FOCUS'}
                 </button>
             </div>
+
+            {/* Accumulated focus bar — only shown when logged in */}
+            {user && (
+                <div className="w-full max-w-[360px]">
+                    <AccumulatedBar minutes={accMinutes} threshold={settings.accThreshold} />
+                </div>
+            )}
 
             {/* Tag autocomplete input */}
             {mode === 'focus' && (
