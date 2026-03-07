@@ -6,9 +6,9 @@ export default function DashboardPage() {
     useEffect(() => {
         fetch('/api/v1/auth/me')
             .then(res => {
-                if (!res.ok) redirect('/auth/login');
+                if (!res.ok) redirect('/auth');
             })
-            .catch(() => redirect('/auth/login'));
+            .catch(() => redirect('/auth'));
     }, []);
 
     return <div>Dashboard</div>;

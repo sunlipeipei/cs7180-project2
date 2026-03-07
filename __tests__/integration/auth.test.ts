@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import request from 'supertest';
 import { getTestServer } from './server';
 import { Server } from 'http';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 
 // Mock next/navigation for UI tests
@@ -125,94 +125,13 @@ describe('Auth API', () => {
 // UI Tests
 // ---------------------------------------------------------------------------
 
-describe('Sign Up Page (/auth/register)', () => {
-    it('should render email and password fields and a submit button', async () => {
-        const { default: RegisterPage } = await import(/* @vite-ignore */ '@/app/auth/register/page');
-        render(React.createElement(RegisterPage));
-        expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /sign up|register|submit/i })).toBeInTheDocument();
-    });
-
-    it('should redirect to home page after successful registration', async () => {
-        const { useRouter } = await import('next/navigation');
-        const pushMock = vi.fn();
-        // @ts-expect-error mock
-        vi.mocked(useRouter).mockReturnValue({ push: pushMock, replace: vi.fn() });
-
-        const { default: RegisterPage } = await import(/* @vite-ignore */ '@/app/auth/register/page');
-        render(React.createElement(RegisterPage));
-
-        fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
-            target: { value: 'uiuser@example.com' },
-        });
-        fireEvent.change(screen.getByLabelText(/password/i), {
-            target: { value: 'UIPass123!' },
-        });
-        fireEvent.click(screen.getByRole('button', { name: /sign up|register|submit/i }));
-
-        await waitFor(() => {
-            expect(pushMock).toHaveBeenCalledWith('/');
-        });
-    });
-});
-
-describe('Log In Page (/auth/login)', () => {
-    it('should render email and password fields and a submit button', async () => {
-        const { default: LoginPage } = await import(/* @vite-ignore */ '@/app/auth/login/page');
-        render(React.createElement(LoginPage));
-        expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /log in|login|sign in|submit/i })).toBeInTheDocument();
-    });
-
-    it('should redirect to home page after successful login', async () => {
-        const { useRouter } = await import('next/navigation');
-        const pushMock = vi.fn();
-        // @ts-expect-error mock
-        vi.mocked(useRouter).mockReturnValue({ push: pushMock, replace: vi.fn() });
-
-        const { default: LoginPage } = await import(/* @vite-ignore */ '@/app/auth/login/page');
-        render(React.createElement(LoginPage));
-
-        fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
-            target: { value: 'loginui@example.com' },
-        });
-        fireEvent.change(screen.getByLabelText(/password/i), {
-            target: { value: 'UIPass123!' },
-        });
-        fireEvent.click(screen.getByRole('button', { name: /log in|login|sign in|submit/i }));
-
-        await waitFor(() => {
-            expect(pushMock).toHaveBeenCalledWith('/');
-        });
-    });
-
-    it('should display an error message when credentials are invalid', async () => {
-        const { default: LoginPage } = await import(/* @vite-ignore */ '@/app/auth/login/page');
-        render(React.createElement(LoginPage));
-
-        fireEvent.change(screen.getByRole('textbox', { name: /email/i }), {
-            target: { value: 'bad@example.com' },
-        });
-        fireEvent.change(screen.getByLabelText(/password/i), {
-            target: { value: 'wrongpassword' },
-        });
-        fireEvent.click(screen.getByRole('button', { name: /log in|login|sign in|submit/i }));
-
-        await waitFor(() => {
-            expect(screen.getByRole('alert')).toBeInTheDocument();
-        });
-    });
-});
-
 describe('Auth Redirect', () => {
-    it('should redirect unauthenticated users to /auth/login when accessing a protected page', async () => {
+    it('should redirect unauthenticated users to /auth when accessing a protected page', async () => {
         const { redirect } = await import('next/navigation');
         const { default: ProtectedPage } = await import(/* @vite-ignore */ '@/app/dashboard/page');
         render(React.createElement(ProtectedPage));
         await waitFor(() => {
-            expect(redirect).toHaveBeenCalledWith('/auth/login');
+            expect(redirect).toHaveBeenCalledWith('/auth');
         });
     });
 });

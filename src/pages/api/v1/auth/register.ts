@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { email, password } = req.body || {};
+    const { email, password, name } = req.body || {};
 
     if (!email || !password) {
         return res.status(400).json({ error: 'Missing fields' });
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const passwordHash = await hashPassword(password);
-    await User.create({ email: email.toLowerCase(), passwordHash });
+    await User.create({ email: email.toLowerCase(), passwordHash, name: name || undefined });
 
     return res.status(201).json({ message: 'User created' });
 }
