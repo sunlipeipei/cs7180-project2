@@ -1,0 +1,152 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/lipeipeisun/Desktop/CS 7180/cs7180-project2[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ POST /api/v1/auth/register 201 in 178ms (compile: 129ms, render: 50ms)
+ POST /api/v1/auth/login 200 in 27ms (compile: 2ms, render: 25ms)
+ POST /api/v1/sessions 201 in 44ms (compile: 4ms, render: 40ms)
+ POST /api/v1/auth/register 201 in 24ms (compile: 317µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 22ms (compile: 318µs, render: 22ms)
+ POST /api/v1/sessions 201 in 1731µs (compile: 305µs, render: 1426µs)
+ POST /api/v1/sessions 401 in 599µs (compile: 272µs, render: 327µs)
+ POST /api/v1/auth/register 201 in 23ms (compile: 189µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 22ms (compile: 253µs, render: 21ms)
+ POST /api/v1/sessions 400 in 785µs (compile: 316µs, render: 469µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 265µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 24ms (compile: 399µs, render: 24ms)
+ POST /api/v1/sessions 400 in 813µs (compile: 324µs, render: 489µs)
+ POST /api/v1/auth/register 201 in 25ms (compile: 265µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 259µs, render: 22ms)
+ POST /api/v1/sessions 400 in 733µs (compile: 308µs, render: 425µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 228µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 276µs, render: 22ms)
+ POST /api/v1/sessions 201 in 1543µs (compile: 283µs, render: 1261µs)
+ GET /api/v1/sessions 200 in 3ms (compile: 256µs, render: 3ms)
+ POST /api/v1/auth/register 201 in 23ms (compile: 225µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 310µs, render: 22ms)
+ POST /api/v1/sessions 201 in 1473µs (compile: 286µs, render: 1187µs)
+ GET /api/v1/sessions 200 in 1783µs (compile: 218µs, render: 1565µs)
+ POST /api/v1/auth/register 201 in 23ms (compile: 243µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 287µs, render: 23ms)
+ POST /api/v1/auth/register 201 in 23ms (compile: 310µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 433µs, render: 23ms)
+ POST /api/v1/sessions 201 in 1470µs (compile: 286µs, render: 1183µs)
+ POST /api/v1/sessions 201 in 1226µs (compile: 256µs, render: 970µs)
+ GET /api/v1/sessions 200 in 1731µs (compile: 234µs, render: 1497µs)
+ [32m✓[39m __tests__/integration/sessions.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1544[2mms[22m[39m
+       [33m[2m✓[22m[39m should return 201 and persist session when authenticated with valid data [33m 477[2mms[22m[39m
+ POST /api/v1/auth/register 201 in 133ms (compile: 83ms, render: 51ms)
+ POST /api/v1/auth/login 200 in 27ms (compile: 2ms, render: 25ms)
+ POST /api/v1/sessions 201 in 6ms (compile: 3ms, render: 2ms)
+ POST /api/v1/sessions 201 in 1439µs (compile: 308µs, render: 1131µs)
+ POST /api/v1/sessions 201 in 1358µs (compile: 279µs, render: 1079µs)
+ GET /api/v1/sessions 200 in 3ms (compile: 274µs, render: 3ms)
+ POST /api/v1/auth/register 201 in 24ms (compile: 255µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 24ms (compile: 293µs, render: 24ms)
+ POST /api/v1/sessions 201 in 1621µs (compile: 307µs, render: 1314µs)
+ POST /api/v1/sessions 201 in 4ms (compile: 312µs, render: 4ms)
+ POST /api/v1/sessions 201 in 1600µs (compile: 317µs, render: 1284µs)
+ POST /api/v1/sessions 201 in 1753µs (compile: 381µs, render: 1372µs)
+ POST /api/v1/sessions 201 in 1579µs (compile: 324µs, render: 1256µs)
+ GET /api/v1/sessions?limit=2 200 in 2ms (compile: 323µs, render: 1897µs)
+ POST /api/v1/auth/register 201 in 51ms (compile: 287µs, render: 51ms)
+ POST /api/v1/auth/login 200 in 34ms (compile: 352µs, render: 33ms)
+ POST /api/v1/sessions 201 in 1976µs (compile: 481µs, render: 1495µs)
+ POST /api/v1/sessions 201 in 3ms (compile: 771µs, render: 1785µs)
+ POST /api/v1/sessions 201 in 1672µs (compile: 389µs, render: 1283µs)
+ POST /api/v1/sessions 201 in 1420µs (compile: 333µs, render: 1088µs)
+ POST /api/v1/sessions 201 in 2ms (compile: 376µs, render: 1737µs)
+ POST /api/v1/sessions 201 in 1322µs (compile: 281µs, render: 1041µs)
+ POST /api/v1/sessions 201 in 1766µs (compile: 310µs, render: 1456µs)
+ POST /api/v1/sessions 201 in 1448µs (compile: 289µs, render: 1159µs)
+ POST /api/v1/sessions 201 in 1263µs (compile: 300µs, render: 963µs)
+ POST /api/v1/sessions 201 in 1301µs (compile: 274µs, render: 1027µs)
+ GET /api/v1/sessions?limit=4 200 in 3ms (compile: 495µs, render: 2ms)
+ POST /api/v1/auth/register 201 in 27ms (compile: 421µs, render: 26ms)
+ POST /api/v1/auth/login 200 in 25ms (compile: 505µs, render: 25ms)
+ POST /api/v1/sessions 201 in 1556µs (compile: 354µs, render: 1202µs)
+ POST /api/v1/sessions 201 in 1199µs (compile: 264µs, render: 935µs)
+ POST /api/v1/sessions 201 in 1158µs (compile: 220µs, render: 938µs)
+ POST /api/v1/sessions 201 in 1426µs (compile: 271µs, render: 1154µs)
+ POST /api/v1/sessions 201 in 1058µs (compile: 222µs, render: 835µs)
+ GET /api/v1/sessions?page=1&limit=3 200 in 1784µs (compile: 278µs, render: 1506µs)
+ GET /api/v1/sessions?page=2&limit=3 200 in 1633µs (compile: 279µs, render: 1353µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 633µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 24ms (compile: 310µs, render: 24ms)
+ POST /api/v1/sessions 201 in 1442µs (compile: 311µs, render: 1131µs)
+ POST /api/v1/sessions 201 in 1173µs (compile: 256µs, render: 918µs)
+ GET /api/v1/sessions?page=99&limit=10 200 in 1739µs (compile: 280µs, render: 1459µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 254µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 291µs, render: 23ms)
+ POST /api/v1/sessions 201 in 1470µs (compile: 314µs, render: 1156µs)
+ POST /api/v1/sessions 201 in 1777µs (compile: 239µs, render: 1539µs)
+ POST /api/v1/sessions 201 in 2ms (compile: 445µs, render: 1635µs)
+ GET /api/v1/sessions 200 in 3ms (compile: 316µs, render: 3ms)
+ GET /api/v1/sessions?page=1&limit=5 401 in 861µs (compile: 393µs, render: 468µs)
+ [32m✓[39m __tests__/integration/session-list-pagination.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 977[2mms[22m[39m
+ POST /api/v1/auth/register 201 in 134ms (compile: 84ms, render: 50ms)
+ POST /api/v1/auth/register 400 in 966µs (compile: 476µs, render: 490µs)
+ POST /api/v1/auth/register 400 in 1680µs (compile: 639µs, render: 1041µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 293µs, render: 24ms)
+ POST /api/v1/auth/register 409 in 1959µs (compile: 301µs, render: 1658µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 267µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 26ms (compile: 2ms, render: 24ms)
+ POST /api/v1/auth/register 201 in 24ms (compile: 328µs, render: 24ms)
+ POST /api/v1/auth/login 401 in 24ms (compile: 308µs, render: 23ms)
+ POST /api/v1/auth/login 401 in 1315µs (compile: 308µs, render: 1007µs)
+ GET /api/v1/sessions 401 in 4ms (compile: 3ms, render: 739µs)
+ POST /api/v1/auth/register 201 in 25ms (compile: 332µs, render: 25ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 300µs, render: 23ms)
+ GET /api/v1/sessions 200 in 4ms (compile: 730µs, render: 3ms)
+ [32m✓[39m __tests__/integration/auth.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 943[2mms[22m[39m
+ GET /api/v1/tags 401 in 86ms (compile: 81ms, render: 6ms)
+ POST /api/v1/auth/register 201 in 49ms (compile: 3ms, render: 46ms)
+ POST /api/v1/auth/login 200 in 26ms (compile: 1971µs, render: 24ms)
+ POST /api/v1/sessions 201 in 5ms (compile: 3ms, render: 2ms)
+ POST /api/v1/sessions 201 in 1518µs (compile: 309µs, render: 1209µs)
+ POST /api/v1/sessions 201 in 1577µs (compile: 292µs, render: 1285µs)
+ POST /api/v1/sessions 201 in 1707µs (compile: 427µs, render: 1280µs)
+ POST /api/v1/sessions 201 in 1533µs (compile: 233µs, render: 1299µs)
+ POST /api/v1/sessions 201 in 1528µs (compile: 312µs, render: 1216µs)
+ GET /api/v1/tags 200 in 2ms (compile: 265µs, render: 1898µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 261µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 391µs, render: 23ms)
+ POST /api/v1/auth/register 201 in 24ms (compile: 285µs, render: 23ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 312µs, render: 23ms)
+ POST /api/v1/sessions 201 in 1647µs (compile: 309µs, render: 1338µs)
+ GET /api/v1/tags 200 in 1419µs (compile: 278µs, render: 1141µs)
+ POST /api/v1/auth/register 201 in 24ms (compile: 256µs, render: 24ms)
+ POST /api/v1/auth/login 200 in 23ms (compile: 306µs, render: 23ms)
+ POST /api/v1/sessions 201 in 1587µs (compile: 297µs, render: 1290µs)
+ POST /api/v1/sessions 201 in 1286µs (compile: 249µs, render: 1036µs)
+ POST /api/v1/sessions 201 in 1535µs (compile: 235µs, render: 1300µs)
+ GET /api/v1/tags 200 in 1312µs (compile: 267µs, render: 1045µs)
+ [32m✓[39m __tests__/integration/tags.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 745[2mms[22m[39m
+ [32m✓[39m __tests__/integration/session-tagging-ui.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+ [32m✓[39m __tests__/integration/timer-settings-ui.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 61[2mms[22m[39m
+ [32m✓[39m __tests__/integration/session-list-ui.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 51[2mms[22m[39m
+ [32m✓[39m __tests__/integration/circular-timer.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ GET /api/v1/health 200 in 174ms (compile: 162ms, render: 12ms)
+ [32m✓[39m __tests__/integration/health.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 528[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m      Tests [22m [1m[32m53 passed[39m[22m[90m (53)[39m
+[2m   Start at [22m 21:27:58
+[2m   Duration [22m 8.51s[2m (transform 96ms, setup 266ms, import 613ms, tests 4.97s, environment 1.02s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   87.09 |    71.25 |   81.63 |   88.69 |                   
+ app/auth/login    |     100 |      100 |     100 |     100 |                   
+  page.tsx         |     100 |      100 |     100 |     100 |                   
+ app/auth/register |   91.66 |       50 |     100 |   91.66 |                   
+  page.tsx         |   91.66 |       50 |     100 |   91.66 | 24                
+ app/dashboard     |   85.71 |       50 |      75 |   83.33 |                   
+  page.tsx         |   85.71 |       50 |      75 |   83.33 | 11                
+ components        |   84.94 |    71.42 |   80.48 |   87.05 |                   
+  ...ularTimer.tsx |     100 |      100 |     100 |     100 |                   
+  SessionList.tsx  |   78.26 |    73.33 |   72.72 |      85 | 24,44,66          
+  TimerWidget.tsx  |      85 |    57.89 |   82.14 |   85.45 | 39,45-46,72-89    
+-------------------|---------|----------|---------|---------|-------------------

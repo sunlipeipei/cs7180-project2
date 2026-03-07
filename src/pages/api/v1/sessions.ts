@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === 'POST') {
-        const { duration, mode } = req.body || {};
+        const { duration, mode, tag } = req.body || {};
 
         if (typeof duration !== 'number' || duration <= 0) {
             return res.status(400).json({ error: 'duration must be a positive number' });
@@ -43,7 +43,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(400).json({ error: `mode must be one of: ${VALID_MODES.join(', ')}` });
         }
 
-        const session = await Session.create({ userId: payload.sub, duration, mode });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sessionPayload: any = { userId: payload.sub, duration, mode };
+        if (typeof tag === 'string' && tag.trim() !== '') {
+            sessionPayload.tag = tag.trim().substring(0, 50);
+        }
+
+        const session = await Session.create(sessionPayload);
         return res.status(201).json({ session });
     }
 
