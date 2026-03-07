@@ -17,7 +17,7 @@ describe('AuthUI (AuthScreen Component)', () => {
 
     it('should render the unified AuthScreen with Login defaults', async () => {
         const { default: AuthScreen } = await import('@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
 
         expect(screen.getByText('DeepWork')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('AuthUI (AuthScreen Component)', () => {
 
     it('should switch between Login and Signup tabs', async () => {
         const { default: AuthScreen } = await import('@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
 
         // Switch to Signup
@@ -45,7 +45,7 @@ describe('AuthUI (AuthScreen Component)', () => {
     it('should show the escape hatch when onBack prop is given', async () => {
         const { default: AuthScreen } = await import('@/components/AuthScreen');
         const mockOnBack = vi.fn();
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(<AuthScreen onAuth={vi.fn()} onBack={mockOnBack} />);
 
         const btn = screen.getByText('Continue without signing in →');
@@ -57,7 +57,7 @@ describe('AuthUI (AuthScreen Component)', () => {
 
     it('should NOT show the escape hatch when no onBack prop is given', async () => {
         const { default: AuthScreen } = await import('@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(<AuthScreen onAuth={vi.fn()} />);
 
         expect(screen.queryByText('Continue without signing in →')).not.toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('AuthUI (AuthScreen Component)', () => {
 
     it('should display error if trying to submit empty form', async () => {
         const { default: AuthScreen } = await import('@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
 
         fireEvent.click(screen.getByText('SIGN IN'));
@@ -74,7 +74,7 @@ describe('AuthUI (AuthScreen Component)', () => {
 
     it('should change input styles on focus and blur', async () => {
         const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(React.createElement(AuthScreen, { onAuth: vi.fn(), onBack: vi.fn() }));
 
         const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement;
@@ -90,7 +90,7 @@ describe('AuthUI (AuthScreen Component)', () => {
         global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
 
         const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
-        // @ts-ignore
+        // @ts-expect-error -- dynamic import loses type info
         render(React.createElement(AuthScreen, { onAuth: vi.fn(), onBack: vi.fn() }));
 
         fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
