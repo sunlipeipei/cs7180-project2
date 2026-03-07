@@ -188,7 +188,7 @@ npx vitest --coverage          # Run with coverage report
 - **PRD: **`PRD.md` in project_memory directory
 - **Architecture: **`technical architecture.md` in project_memory directory
 - **Mom Test notes: **`mom_test_notes.md` in project_memory directory (user research backing every feature decision)
-- **UI Design: **`deepwork_prototype.jsx` in project_memory directory
+- **UI Design: **`deepwork_prototype_V2.jsx` in project_memory directory
 
 ### Key Product Decisions (from user research)
 

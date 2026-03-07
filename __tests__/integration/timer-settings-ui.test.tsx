@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
+
+vi.mock('next/navigation', () => ({
+    useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
 import { TimerWidget } from '@/components/TimerWidget';
 
 // Mock timer hooks so we can isolate the component UI
@@ -37,11 +41,11 @@ describe('TimerWidget Settings UI', () => {
         });
 
         // Click settings button
-        const settingsBtn = screen.getByText('SETTINGS');
+        const settingsBtn = screen.getByText('Settings');
         fireEvent.click(settingsBtn);
 
         // Modal should appear
-        expect(screen.getByText('Settings')).toBeInTheDocument();
+        expect(screen.getAllByText('Settings').length).toBeGreaterThan(0);
         expect(screen.getByText('Work Duration')).toBeInTheDocument();
 
         // Close using the SAVE button
@@ -50,7 +54,7 @@ describe('TimerWidget Settings UI', () => {
 
         // Modal should disappear (we wait for it to be removed, but since it's conditional rendering, checking query is enough)
         await waitFor(() => {
-            expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+            expect(screen.queryByText('Work Duration')).not.toBeInTheDocument();
         });
     });
 
@@ -59,7 +63,7 @@ describe('TimerWidget Settings UI', () => {
             render(<TimerWidget />);
         });
 
-        const settingsBtn = screen.getByText('SETTINGS');
+        const settingsBtn = screen.getByText('Settings');
         fireEvent.click(settingsBtn);
 
         // Find the range inputs
@@ -87,7 +91,7 @@ describe('TimerWidget Settings UI', () => {
         }
 
         await waitFor(() => {
-            expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+            expect(screen.queryByText('Work Duration')).not.toBeInTheDocument();
         });
     });
 });

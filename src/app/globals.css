@@ -21,10 +21,32 @@
   --font-sans: 'Lato', sans-serif;
 }
 
+@layer base {
+  :root {
+    /* Short-form aliases used by inline styles and the prototype */
+    --bg: #0e0d0b;
+    --bg2: #141210;
+    --bg3: #1c1916;
+    --surface: #222019;
+    --border: #2e2b25;
+    --amber: #c8843a;
+    --amber-dim: #8a5a26;
+    --amber-glow: #c8843a33;
+    --text: #e8e0d0;
+    --text-dim: #7a7060;
+    --text-muted: #4a4438;
+    --red: #b85555;
+    --green: #6a9a6a;
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Lato', sans-serif;
+  }
+}
+
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
   height: 100vh;
   margin: 0;
 }

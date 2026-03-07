@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTimer, TimerSettings, TimerMode } from '@/hooks/useTimer';
 import { CircularTimer } from '@/components/CircularTimer';
 
@@ -22,6 +23,8 @@ export function TimerWidget() {
     const [sessionTag, setSessionTag] = useState('');
     const [tagSuggestions, setTagSuggestions] = useState<{ _id: string, count: number }[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [user, setUser] = useState<{ email: string, name?: string } | null>(null);
+    const router = useRouter();
 
     // Create a ref for the dropdown to handle outside clicks
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,8 +32,18 @@ export function TimerWidget() {
     const [accMinutes, setAccMinutes] = useState(0);
     const [notification, setNotification] = useState<string | null>(null);
 
-    // Fetch tags on mount
+    // Fetch user and tags on mount
     useEffect(() => {
+        fetch('/api/v1/auth/me')
+            .then(res => {
+                if (res.ok) return res.json();
+                return null;
+            })
+            .then(data => {
+                if (data && data.data) setUser(data.data);
+            })
+            .catch(err => console.error('Failed to get user:', err));
+
         fetch('/api/v1/tags')
             .then(res => res.json())
             .then(data => {
@@ -53,6 +66,16 @@ export function TimerWidget() {
     const notify = (msg: string, duration = 4000) => {
         setNotification(msg);
         setTimeout(() => setNotification(null), duration);
+    };
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/v1/auth/logout', { method: 'POST' });
+            setUser(null);
+            router.refresh();
+        } catch (err) {
+            console.error('Logout failed', err);
+        }
     };
 
     const handleSessionEnd = (completedMode: TimerMode) => {
@@ -157,13 +180,52 @@ export function TimerWidget() {
             )}
 
             {/* top bar controls */}
-            <div className="fixed top-0 left-0 right-0 p-4 flex justify-end">
-                <button
-                    onClick={() => setShowSettings(true)}
-                    className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-widest transition-colors"
-                >
-                    SETTINGS
-                </button>
+            <div className="fixed top-0 left-0 right-0 py-4 px-6 flex items-center justify-between border-b border-[#2e2b25] bg-[#0e0d0b]/80 backdrop-blur-md z-30">
+                <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full bg-[#c8843a] ${running ? 'animate-pulse shadow-[0_0_8px_#c8843a]' : ''}`} />
+                    <span className="font-serif text-lg italic tracking-[0.02em] text-[#e8e0d0]">DeepWork</span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => {
+                            if (user) router.push('/dashboard');
+                            else router.push('/auth');
+                        }}
+                        className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-[0.1em] transition-colors"
+                    >
+                        History
+                    </button>
+                    <button
+                        onClick={() => setShowSettings(true)}
+                        className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-[0.1em] transition-colors"
+                    >
+                        Settings
+                    </button>
+
+                    <div className="w-[1px] h-3.5 bg-[#2e2b25] mx-1" />
+
+                    {user ? (
+                        <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-[#8a5a26] border border-[#c8843a] flex items-center justify-center font-mono text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
+                                {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                            </div>
+                            <button
+                                onClick={handleLogout}
+                                className="text-[#c8843a] hover:opacity-80 font-mono text-[10px] tracking-[0.15em] transition-opacity"
+                            >
+                                SIGN OUT
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => router.push('/auth')}
+                            className="bg-[#c8843a] text-[#141210] px-4 py-1.5 rounded-md font-mono text-[10px] tracking-[0.15em] hover:opacity-85 transition-opacity"
+                        >
+                            SIGN IN
+                        </button>
+                    )}
+                </div>
             </div>
 
 

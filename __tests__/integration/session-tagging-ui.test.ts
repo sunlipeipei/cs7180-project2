@@ -2,6 +2,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 
+vi.mock('next/navigation', () => ({
+    useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
+
 // Mock timer hooks so we can easily trigger session end and focus toggle
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let globalFinishFn: any = null;
@@ -34,12 +38,15 @@ vi.mock('@/hooks/useTimer', () => {
 describe('TimerWidget Tag Autocomplete UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
-        global.fetch = vi.fn().mockResolvedValue(
-            new Response(JSON.stringify({ tags: [] }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            }),
-        );
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        });
     });
 
     it('should fetch tags on mount', async () => {
@@ -69,17 +76,20 @@ describe('TimerWidget Tag Autocomplete UI', () => {
     });
 
     it('should display autocomplete suggestions based on fetch', async () => {
-        global.fetch = vi.fn().mockResolvedValue(
-            new Response(JSON.stringify({
-                tags: [
-                    { _id: 'Coding', count: 5 },
-                    { _id: 'Reading', count: 2 }
-                ]
-            }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            }),
-        );
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({
+                    tags: [
+                        { _id: 'Coding', count: 5 },
+                        { _id: 'Reading', count: 2 }
+                    ]
+                }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        });
 
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
         render(React.createElement(TimerWidget));
@@ -99,11 +109,14 @@ describe('TimerWidget Tag Autocomplete UI', () => {
     });
 
     it('should update input when autocomplete suggestion is clicked', async () => {
-        global.fetch = vi.fn().mockResolvedValue(
-            new Response(JSON.stringify({
-                tags: [{ _id: 'Code Review', count: 10 }]
-            }), { status: 200 }),
-        );
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({
+                    tags: [{ _id: 'Code Review', count: 10 }]
+                }), { status: 200 }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        });
 
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
         render(React.createElement(TimerWidget));
