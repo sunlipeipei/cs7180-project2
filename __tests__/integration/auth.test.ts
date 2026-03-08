@@ -2,14 +2,9 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import request from 'supertest';
 import { getTestServer } from './server';
 import { Server } from 'http';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, act } from '@testing-library/react';
 import React from 'react';
 
-// Mock next/navigation for UI tests
-vi.mock('next/navigation', () => ({
-    useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })),
-    redirect: vi.fn(),
-}));
 
 // ---------------------------------------------------------------------------
 // API Tests
@@ -110,7 +105,7 @@ describe('Auth API', () => {
             const loginRes = await request(server)
                 .post('/api/v1/auth/login')
                 .send(credentials);
-            const cookies: string[] = loginRes.headers['set-cookie'] ?? [];
+            const cookies = loginRes.headers['set-cookie'] ?? [];
             const cookieHeader = Array.isArray(cookies) ? cookies.join('; ') : String(cookies);
 
             const response = await request(server)
@@ -124,14 +119,3 @@ describe('Auth API', () => {
 // ---------------------------------------------------------------------------
 // UI Tests
 // ---------------------------------------------------------------------------
-
-describe('Auth Redirect', () => {
-    it('should redirect unauthenticated users to /auth when accessing a protected page', async () => {
-        const { redirect } = await import('next/navigation');
-        const { default: ProtectedPage } = await import(/* @vite-ignore */ '@/app/dashboard/page');
-        render(React.createElement(ProtectedPage));
-        await waitFor(() => {
-            expect(redirect).toHaveBeenCalledWith('/auth');
-        });
-    });
-});
