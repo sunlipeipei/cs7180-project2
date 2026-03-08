@@ -67,7 +67,11 @@ export default function DashboardPage() {
     useEffect(() => {
         fetch('/api/v1/auth/me')
             .then(res => {
-                if (!res.ok) { router.replace('/auth'); return null; }
+                if (!res.ok) {
+                    console.log('TEST DEBUG: Auth check failed, redirecting');
+                    router.replace('/auth');
+                    return null;
+                }
                 return res.json();
             })
             .then(authData => {
@@ -79,7 +83,10 @@ export default function DashboardPage() {
                     })
                     .then(json => setData(json.data));
             })
-            .catch(() => setError('Failed to load analytics data.'))
+            .catch(err => {
+                console.log('TEST DEBUG: Catch block hit', err);
+                setError('Failed to load analytics data.');
+            })
             .finally(() => setLoading(false));
     }, [router]);
 
