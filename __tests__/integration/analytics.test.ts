@@ -76,7 +76,8 @@ describe('GET /api/v1/analytics', () => {
         expect(res.status).toBe(200);
         expect(res.body.data.todayStats.minutes).toBe(75);
         expect(res.body.data.todayStats.sessionCount).toBe(2);
-        expect(res.body.data.todayStats.avgMinutes).toBe(37);
+        // 4500 / 2 = 2250 seconds = 37.5 minutes -> Math.round is 38
+        expect(res.body.data.todayStats.avgMinutes).toBe(38);
     });
 
     it('excludes break sessions from byTag but includes untagged focus as Untitled', async () => {
