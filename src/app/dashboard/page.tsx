@@ -86,12 +86,22 @@ export default function DashboardPage() {
     const saveTag = (sessionId: string) => {
         const trimmed = editingTag.trim();
         setEditingId(null);
-        setData(prev => prev ? ({
-            ...prev,
-            recentSessions: prev.recentSessions.map(s =>
+        setData(prev => {
+            if (!prev) return prev;
+            const updatedSessions = prev.recentSessions.map(s =>
                 s._id === sessionId ? { ...s, tag: trimmed || undefined } : s
-            ),
-        }) : prev);
+            );
+            // Recompute byTag from updated sessions so Time by Project stays in sync
+            const tagMap: Record<string, number> = {};
+            updatedSessions.forEach(s => {
+                const key = s.tag ?? 'Untitled';
+                tagMap[key] = (tagMap[key] || 0) + Math.round(s.duration / 60);
+            });
+            const newByTag = Object.entries(tagMap)
+                .map(([tag, minutes]) => ({ tag, minutes }))
+                .sort((a, b) => b.minutes - a.minutes);
+            return { ...prev, recentSessions: updatedSessions, byTag: newByTag };
+        });
         fetch(`/api/v1/sessions/${sessionId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
