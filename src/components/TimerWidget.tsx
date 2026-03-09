@@ -6,6 +6,7 @@ import { useTimer, TimerSettings, TimerMode } from '@/hooks/useTimer';
 import { CircularTimer } from '@/components/CircularTimer';
 import { AccumulatedBar } from '@/components/AccumulatedBar';
 import { BreakSuggestion, randomSuggestion } from '@/components/BreakSuggestion';
+import { useAuth } from '@/contexts/AuthContext';
 
 const fmt = (s: number) => {
     const m = Math.floor(s / 60).toString().padStart(2, '0');
@@ -14,19 +15,41 @@ const fmt = (s: number) => {
 };
 
 export function TimerWidget() {
+    const { user: authUser, updateSettings, loading, logout } = useAuth();
+
     const [settings, setSettings] = useState<TimerSettings>({
-        workMinutes: 45,
-        shortBreakMinutes: 10,
-        longBreakMinutes: 20,
-        accThreshold: 100,
+        workMinutes: authUser?.settings?.workDuration ?? 45,
+        shortBreakMinutes: authUser?.settings?.shortBreakDuration ?? 10,
+        longBreakMinutes: authUser?.settings?.longBreakDuration ?? 20,
+        accThreshold: authUser?.settings?.dailyFocusThreshold ?? 100,
     });
 
     const [showSettings, setShowSettings] = useState(false);
+    const [savingSettings, setSavingSettings] = useState(false);
     const [sessionTag, setSessionTag] = useState('');
     const [tagSuggestions, setTagSuggestions] = useState<{ _id: string, count: number }[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [user, setUser] = useState<{ email: string, name?: string } | null>(null);
     const router = useRouter();
+
+    // Sync timer settings whenever authUser changes (e.g. login, logout)
+    useEffect(() => {
+        if (authUser?.settings) {
+            setSettings({
+                workMinutes: authUser.settings.workDuration,
+                shortBreakMinutes: authUser.settings.shortBreakDuration,
+                longBreakMinutes: authUser.settings.longBreakDuration,
+                accThreshold: authUser.settings.dailyFocusThreshold,
+            });
+        } else {
+            // Revert to defaults on logout
+            setSettings({
+                workMinutes: 45,
+                shortBreakMinutes: 10,
+                longBreakMinutes: 20,
+                accThreshold: 100,
+            });
+        }
+    }, [authUser]);
 
     // Create a ref for the dropdown to handle outside clicks
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -42,20 +65,11 @@ export function TimerWidget() {
             .catch(err => console.error('Failed to fetch accumulated:', err));
     };
 
-    // Fetch user, tags, and accumulated on mount
+    // Fetch tags and accumulated
     useEffect(() => {
-        fetch('/api/v1/auth/me')
-            .then(res => {
-                if (res.ok) return res.json();
-                return null;
-            })
-            .then(data => {
-                if (data && data.data) {
-                    setUser(data.data);
-                    fetchAccumulated(); // only makes sense if logged in
-                }
-            })
-            .catch(err => console.error('Failed to get user:', err));
+        if (authUser) {
+            fetchAccumulated(); // only makes sense if logged in
+        }
 
         fetch('/api/v1/tags')
             .then(res => res.json())
@@ -63,7 +77,7 @@ export function TimerWidget() {
                 if (data.tags) setTagSuggestions(data.tags);
             })
             .catch(err => console.error('Failed to load tags:', err));
-    }, []);
+    }, [authUser]);
 
     // Handle clicks outside the dropdown to close it
     useEffect(() => {
@@ -83,9 +97,7 @@ export function TimerWidget() {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/v1/auth/logout', { method: 'POST' });
-            setUser(null);
-            router.refresh();
+            await logout();
         } catch (err) {
             console.error('Logout failed', err);
         }
@@ -150,6 +162,15 @@ export function TimerWidget() {
         setSettings(s => ({ ...s, [key]: val }));
     };
 
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-[#0e0d0b]">
+                <div className="w-8 h-8 border-2 border-[#c8843a] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div className="font-mono text-xs text-[#7a7060] tracking-[0.2em] uppercase">Loading DeepWork...</div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col items-center gap-8 justify-center min-h-screen">
 
@@ -184,10 +205,26 @@ export function TimerWidget() {
                         ))}
 
                         <button
-                            onClick={() => setShowSettings(false)}
-                            className="w-full mt-4 p-3 bg-[#c8843a] text-[#1a1208] rounded-md font-mono text-xs tracking-widest hover:opacity-85 transition-opacity"
+                            disabled={savingSettings}
+                            onClick={async () => {
+                                setSavingSettings(true);
+                                try {
+                                    await updateSettings({
+                                        workDuration: settings.workMinutes,
+                                        shortBreakDuration: settings.shortBreakMinutes,
+                                        longBreakDuration: settings.longBreakMinutes,
+                                        dailyFocusThreshold: settings.accThreshold,
+                                    });
+                                } catch {
+                                    // silent — optimistic update already applied
+                                } finally {
+                                    setSavingSettings(false);
+                                    setShowSettings(false);
+                                }
+                            }}
+                            className="w-full mt-4 p-3 bg-[#c8843a] text-[#1a1208] rounded-md font-mono text-xs tracking-widest hover:opacity-85 transition-opacity disabled:opacity-50"
                         >
-                            SAVE (Takes effect next session)
+                            {savingSettings ? 'SAVING...' : 'SAVE'}
                         </button>
                     </div>
                 </div>
@@ -210,7 +247,7 @@ export function TimerWidget() {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => {
-                            if (user) router.push('/dashboard');
+                            if (authUser) router.push('/dashboard');
                             else router.push('/auth');
                         }}
                         className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-[0.1em] transition-colors"
@@ -226,10 +263,10 @@ export function TimerWidget() {
 
                     <div className="w-[1px] h-3.5 bg-[#2e2b25] mx-1" />
 
-                    {user ? (
+                    {authUser ? (
                         <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-full bg-[#8a5a26] border border-[#c8843a] flex items-center justify-center font-mono text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
-                                {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                                {authUser.name ? authUser.name.charAt(0).toUpperCase() : authUser.email.charAt(0).toUpperCase()}
                             </div>
                             <button
                                 onClick={handleLogout}
@@ -298,7 +335,7 @@ export function TimerWidget() {
             </div>
 
             {/* Accumulated focus bar — only shown when logged in */}
-            {user && (
+            {authUser && (
                 <div className="w-full max-w-[360px]">
                     <AccumulatedBar minutes={accMinutes} threshold={settings.accThreshold} />
                 </div>
