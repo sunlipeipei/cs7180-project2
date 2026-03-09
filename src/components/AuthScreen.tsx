@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AuthScreen({ onAuth, onBack }: { onAuth?: (user: { email: string; name: string }) => void, onBack?: () => void }) {
     const router = useRouter();
+    const { login } = useAuth();
     const [tab, setTab] = useState<'login' | 'signup'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -31,6 +33,11 @@ export default function AuthScreen({ onAuth, onBack }: { onAuth?: (user: { email
             setLoading(false);
 
             if (res.ok) {
+                const data = await res.json();
+                if (data.user) {
+                    login(data.user);
+                }
+
                 if (onAuth) {
                     onAuth({ email, name: name || email.split('@')[0] });
                 } else {

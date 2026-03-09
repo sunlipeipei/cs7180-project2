@@ -2,20 +2,36 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import React from 'react';
 
+vi.mock('@/contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+}));
+import { useAuth } from '@/contexts/AuthContext';
+
 const mockPush = vi.fn();
+const mockRefresh = vi.fn();
 vi.mock('next/navigation', () => ({
     useRouter: () => ({
         push: mockPush,
+        refresh: mockRefresh,
     }),
 }));
 
 describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockPush.mockClear();
+        mockRefresh.mockClear();
     });
 
     it('renders a guest top bar when unauthenticated', async () => {
-        // Mock fetch for both /tags and /auth/me
+        vi.mocked(useAuth).mockReturnValue({
+            user: null,
+            loading: false,
+            updateSettings: vi.fn(),
+            logout: vi.fn(),
+        });
+
+        // Mock fetch for /tags
         global.fetch = vi.fn().mockImplementation((url) => {
             if (url === '/api/v1/auth/me') {
                 return Promise.resolve(new Response(null, { status: 401 }));
@@ -27,7 +43,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
         render(<TimerWidget />);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/me');
+            expect(screen.getByText('DeepWork')).toBeInTheDocument();
         });
 
         // The top bar should have "DeepWork", "History", "Settings" but no avatar or sign out
@@ -43,7 +59,14 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
     });
 
     it('renders an authenticated top bar when logged in', async () => {
-        // Mock fetch to return a user
+        vi.mocked(useAuth).mockReturnValue({
+            user: { email: 'test@example.com', name: 'Test' },
+            loading: false,
+            updateSettings: vi.fn(),
+            logout: vi.fn(),
+        });
+
+        // Mock fetch for tags
         global.fetch = vi.fn().mockImplementation((url) => {
             if (url === '/api/v1/auth/me') {
                 return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com', name: 'Test' } }), { status: 200 }));
@@ -67,6 +90,14 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
     });
 
     it('handles sign out correctly', async () => {
+        const mockLogout = vi.fn().mockResolvedValue(undefined);
+        vi.mocked(useAuth).mockReturnValue({
+            user: { email: 'test@example.com', name: 'Test' },
+            loading: false,
+            updateSettings: vi.fn(),
+            logout: mockLogout,
+        });
+
         global.fetch = vi.fn().mockImplementation((url, init) => {
             if (url === '/api/v1/auth/me') {
                 return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com', name: 'Test' } }), { status: 200 }));
@@ -86,14 +117,9 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
 
         fireEvent.click(screen.getByText('SIGN OUT'));
 
-        // Should call the logout API
+        // Should call the context logout fn
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/logout', expect.objectContaining({ method: 'POST' }));
-        });
-
-        // UI should revert to guest state
-        await waitFor(() => {
-            expect(screen.queryByText('SIGN OUT')).not.toBeInTheDocument();
+            expect(mockLogout).toHaveBeenCalled();
         });
     });
 });

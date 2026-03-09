@@ -24,5 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const token = signJWT({ sub: user._id.toString() });
     res.setHeader('Set-Cookie', `token=${token}; HttpOnly; SameSite=Strict; Path=/`);
-    return res.status(200).json({ message: 'Logged in' });
+    return res.status(200).json({
+        message: 'Logged in',
+        user: {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name ?? user.email.split('@')[0],
+            settings: user.settings,
+        }
+    });
 }

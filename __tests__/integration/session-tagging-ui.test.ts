@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
+
+vi.mock('@/contexts/AuthContext', () => ({
+    useAuth: vi.fn(),
+}));
+import { useAuth } from '@/contexts/AuthContext';
 
 vi.mock('next/navigation', () => ({
     useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -38,6 +43,11 @@ vi.mock('@/hooks/useTimer', () => {
 describe('TimerWidget Tag Autocomplete UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+        vi.mocked(useAuth).mockReturnValue({
+            user: { email: 'test@example.com', name: 'Test', settings: { workDuration: 45, shortBreakDuration: 10, longBreakDuration: 20, dailyFocusThreshold: 100 } },
+            loading: false,
+            updateSettings: vi.fn(),
+        });
         global.fetch = vi.fn().mockImplementation((url: string) => {
             if (url === '/api/v1/tags') {
                 return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
@@ -51,7 +61,9 @@ describe('TimerWidget Tag Autocomplete UI', () => {
 
     it('should fetch tags on mount', async () => {
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith('/api/v1/tags');
@@ -60,17 +72,23 @@ describe('TimerWidget Tag Autocomplete UI', () => {
 
     it('should render a tag input when in focus mode', async () => {
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         expect(screen.getByPlaceholderText(/tag this session/i)).toBeInTheDocument();
     });
 
     it('should allow user to type a new tag', async () => {
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         const input = screen.getByPlaceholderText(/tag this session/i) as HTMLInputElement;
-        fireEvent.change(input, { target: { value: 'Coding - Auth' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'Coding - Auth' } });
+        });
 
         expect(input.value).toBe('Coding - Auth');
     });
@@ -92,7 +110,9 @@ describe('TimerWidget Tag Autocomplete UI', () => {
         });
 
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalled();
@@ -100,7 +120,9 @@ describe('TimerWidget Tag Autocomplete UI', () => {
 
         const input = screen.getByPlaceholderText(/tag this session/i);
         // Focus the input to show dropdown
-        fireEvent.focus(input);
+        act(() => {
+            fireEvent.focus(input);
+        });
 
         await waitFor(() => {
             expect(screen.getByText('Coding')).toBeInTheDocument();
@@ -119,16 +141,22 @@ describe('TimerWidget Tag Autocomplete UI', () => {
         });
 
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         const input = screen.getByPlaceholderText(/tag this session/i) as HTMLInputElement;
-        fireEvent.focus(input);
+        act(() => {
+            fireEvent.focus(input);
+        });
 
         await waitFor(() => {
             expect(screen.getByText('Code Review')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Code Review'));
+        act(() => {
+            fireEvent.click(screen.getByText('Code Review'));
+        });
 
         expect(input.value).toBe('Code Review');
     });
@@ -137,7 +165,10 @@ describe('TimerWidget Tag Autocomplete UI', () => {
         const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
         // import is only needed for mock internal state, but unused for component render
         await import(/* @vite-ignore */ '@/hooks/useTimer');
-        render(React.createElement(TimerWidget));
+
+        await act(async () => {
+            render(React.createElement(TimerWidget));
+        });
 
         // Let mount fetch resolve
         await waitFor(() => {
@@ -146,14 +177,18 @@ describe('TimerWidget Tag Autocomplete UI', () => {
 
         // Set tag
         const input = screen.getByPlaceholderText(/tag this session/i);
-        fireEvent.change(input, { target: { value: 'Deep Work Session' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'Deep Work Session' } });
+        });
 
         // Mock fetch for POST
         global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ session: {} }), { status: 201 }));
 
         // Fire the session end explicitly using the global finish fn stored by the mock
         if (globalFinishFn) {
-            globalFinishFn('focus');
+            await act(async () => {
+                globalFinishFn('focus');
+            });
         }
 
         await waitFor(() => {

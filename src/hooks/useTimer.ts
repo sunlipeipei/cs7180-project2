@@ -38,6 +38,14 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
         // DeepWork's philosophy is non-coercive transitions.
     }, [mode, onSessionEnd]);
 
+    // Handle dynamic settings change
+    useEffect(() => {
+        if (!running) {
+            setSecondsLeft(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [totalSeconds]);
+
     useEffect(() => {
         if (!running) {
             if (intervalRef.current) {
