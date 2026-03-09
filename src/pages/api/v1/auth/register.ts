@@ -22,15 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const passwordHash = await hashPassword(password);
-    const user = await User.create({ email: email.toLowerCase(), passwordHash, name: name || undefined });
+    await User.create({ email: email.toLowerCase(), passwordHash, name: name || undefined });
 
-    return res.status(201).json({
-        message: 'User created',
-        user: {
-            id: user._id.toString(),
-            email: user.email,
-            name: user.name ?? user.email.split('@')[0],
-            settings: user.settings,
-        }
-    });
+    return res.status(201).json({ message: 'User created' });
 }

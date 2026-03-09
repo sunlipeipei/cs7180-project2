@@ -7,11 +7,6 @@ vi.mock('next/navigation', () => ({
 }));
 import { TimerWidget } from '@/components/TimerWidget';
 
-vi.mock('@/contexts/AuthContext', () => ({
-    useAuth: vi.fn(),
-}));
-import { useAuth } from '@/contexts/AuthContext';
-
 // Mock timer hooks so we can isolate the component UI
 vi.mock('@/hooks/useTimer', () => {
     return {
@@ -32,11 +27,6 @@ vi.mock('@/hooks/useTimer', () => {
 describe('TimerWidget Settings UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
-        vi.mocked(useAuth).mockReturnValue({
-            user: { email: 'test@example.com', name: 'Test', settings: { workDuration: 45, shortBreakDuration: 10, longBreakDuration: 20, dailyFocusThreshold: 100 } },
-            loading: false,
-            updateSettings: vi.fn(),
-        });
         global.fetch = vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ tags: [] }), {
                 status: 200,
