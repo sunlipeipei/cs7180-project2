@@ -68,7 +68,7 @@ describe('TimerWidget Settings UI', () => {
 
         // Find the range inputs
         const sliders = screen.getAllByRole('slider') as HTMLInputElement[];
-        expect(sliders.length).toBe(3); // Work, Short Break, Long Break
+        expect(sliders.length).toBe(4); // Work, Short Break, Long Break, Focus Threshold
 
         // Change Work Duration (first slider)
         fireEvent.change(sliders[0], { target: { value: '50' } });
@@ -79,10 +79,14 @@ describe('TimerWidget Settings UI', () => {
         // Change Long Break (third slider)
         fireEvent.change(sliders[2], { target: { value: '30' } });
 
+        // Change Focus Threshold (fourth slider)
+        fireEvent.change(sliders[3], { target: { value: '150' } });
+
         // Ensure the mock functions triggered state changes visually
         expect(screen.getByText('50 min')).toBeInTheDocument();
         expect(screen.getByText('15 min')).toBeInTheDocument();
         expect(screen.getByText('30 min')).toBeInTheDocument();
+        expect(screen.getByText('150 min')).toBeInTheDocument();
 
         // Click outside the modal to close it
         const overlay = document.querySelector('.bg-black\\/80');

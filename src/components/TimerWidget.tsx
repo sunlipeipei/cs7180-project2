@@ -169,6 +169,7 @@ export function TimerWidget() {
                             { label: 'Work Duration', key: 'workMinutes', unit: 'min', min: 1, max: 120 },
                             { label: 'Short Break', key: 'shortBreakMinutes', unit: 'min', min: 1, max: 30 },
                             { label: 'Long Break', key: 'longBreakMinutes', unit: 'min', min: 5, max: 60 },
+                            { label: 'Focus Threshold', key: 'accThreshold', unit: 'min', min: 25, max: 300 },
                         ] as const).map(({ label, key, unit, min, max }) => (
                             <div key={key} className="mb-5">
                                 <div className="flex justify-between mb-2">
