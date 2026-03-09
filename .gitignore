@@ -43,5 +43,3 @@ coverage/
 .claude/
 CLAUDE.md
 tsconfig.tsbuildinfo
-
-coverage.json

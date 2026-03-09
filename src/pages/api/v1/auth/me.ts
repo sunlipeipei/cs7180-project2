@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await dbConnect();
 
-    const user = await User.findById(payload.sub).lean() as { _id: { toString(): string }; email: string; name?: string; settings?: Record<string, number> } | null;
+    const user = await User.findById(payload.sub).lean() as { _id: { toString(): string }; email: string; name?: string } | null;
     if (!user) {
         return res.status(401).json({ error: 'User not found' });
     }
@@ -30,12 +30,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             id: user._id.toString(),
             email: user.email,
             name: user.name ?? user.email.split('@')[0],
-            settings: user.settings ?? {
-                workDuration: 25,
-                shortBreakDuration: 5,
-                longBreakDuration: 15,
-                dailyFocusThreshold: 100,
-            },
         },
     });
 }

@@ -10,14 +10,6 @@ vi.mock('next/navigation', () => ({
     }),
 }));
 
-// Mock useAuth
-const mockLogin = vi.fn();
-vi.mock('@/contexts/AuthContext', () => ({
-    useAuth: () => ({
-        login: mockLogin,
-    }),
-}));
-
 describe('AuthUI (AuthScreen Component)', () => {
     beforeEach(() => {
         vi.clearAllMocks();
