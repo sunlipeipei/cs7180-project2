@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
+import { TimerWidget } from '@/components/TimerWidget';
 
 vi.mock('next/navigation', () => ({
     useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -39,6 +40,11 @@ describe('TimerWidget Tag Autocomplete UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
         global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/auth/me') {
+                return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com' } }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
             if (url === '/api/v1/tags') {
                 return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
                     status: 200,
@@ -50,8 +56,7 @@ describe('TimerWidget Tag Autocomplete UI', () => {
     });
 
     it('should fetch tags on mount', async () => {
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith('/api/v1/tags');
@@ -59,24 +64,35 @@ describe('TimerWidget Tag Autocomplete UI', () => {
     });
 
     it('should render a tag input when in focus mode', async () => {
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
 
         expect(screen.getByPlaceholderText(/tag this session/i)).toBeInTheDocument();
     });
 
     it('should allow user to type a new tag', async () => {
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
 
         const input = screen.getByPlaceholderText(/tag this session/i) as HTMLInputElement;
-        fireEvent.change(input, { target: { value: 'Coding - Auth' } });
+        await act(async () => { fireEvent.change(input, { target: { value: 'Coding - Auth' } }); });
 
         expect(input.value).toBe('Coding - Auth');
     });
 
     it('should display autocomplete suggestions based on fetch', async () => {
         global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/auth/me') {
+                return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com' } }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
             if (url === '/api/v1/tags') {
                 return Promise.resolve(new Response(JSON.stringify({
                     tags: [
@@ -91,16 +107,15 @@ describe('TimerWidget Tag Autocomplete UI', () => {
             return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
         });
 
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalled();
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
         });
 
         const input = screen.getByPlaceholderText(/tag this session/i);
         // Focus the input to show dropdown
-        fireEvent.focus(input);
+        await act(async () => { fireEvent.focus(input); });
 
         await waitFor(() => {
             expect(screen.getByText('Coding')).toBeInTheDocument();
@@ -110,6 +125,11 @@ describe('TimerWidget Tag Autocomplete UI', () => {
 
     it('should update input when autocomplete suggestion is clicked', async () => {
         global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/auth/me') {
+                return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com' } }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
             if (url === '/api/v1/tags') {
                 return Promise.resolve(new Response(JSON.stringify({
                     tags: [{ _id: 'Code Review', count: 10 }]
@@ -118,42 +138,42 @@ describe('TimerWidget Tag Autocomplete UI', () => {
             return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
         });
 
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
 
         const input = screen.getByPlaceholderText(/tag this session/i) as HTMLInputElement;
-        fireEvent.focus(input);
+        await act(async () => { fireEvent.focus(input); });
 
         await waitFor(() => {
             expect(screen.getByText('Code Review')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('Code Review'));
+        await act(async () => { fireEvent.click(screen.getByText('Code Review')); });
 
         expect(input.value).toBe('Code Review');
     });
 
     it('should POST session with tag when session ends', async () => {
-        const { TimerWidget } = await import(/* @vite-ignore */ '@/components/TimerWidget');
-        // import is only needed for mock internal state, but unused for component render
-        await import(/* @vite-ignore */ '@/hooks/useTimer');
-        render(React.createElement(TimerWidget));
+        await act(async () => { render(<TimerWidget />); });
 
         // Let mount fetch resolve
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/v1/tags');
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
         });
 
         // Set tag
         const input = screen.getByPlaceholderText(/tag this session/i);
-        fireEvent.change(input, { target: { value: 'Deep Work Session' } });
+        await act(async () => { fireEvent.change(input, { target: { value: 'Deep Work Session' } }); });
 
         // Mock fetch for POST
         global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ session: {} }), { status: 201 }));
 
         // Fire the session end explicitly using the global finish fn stored by the mock
         if (globalFinishFn) {
-            globalFinishFn('focus');
+            await act(async () => { globalFinishFn('focus'); });
         }
 
         await waitFor(() => {
