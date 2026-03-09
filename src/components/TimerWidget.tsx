@@ -25,7 +25,8 @@ export function TimerWidget() {
     const [sessionTag, setSessionTag] = useState('');
     const [tagSuggestions, setTagSuggestions] = useState<{ _id: string, count: number }[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [user, setUser] = useState<{ email: string, name?: string } | null>(null);
+    const [user, setUser] = useState<{ email: string, name?: string, settings?: Record<string, number> } | null>(null);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
     const router = useRouter();
 
     // Create a ref for the dropdown to handle outside clicks
@@ -52,10 +53,19 @@ export function TimerWidget() {
             .then(data => {
                 if (data && data.data) {
                     setUser(data.data);
+                    if (data.data.settings) {
+                        setSettings({
+                            workMinutes: data.data.settings.workDuration ?? 45,
+                            shortBreakMinutes: data.data.settings.shortBreakDuration ?? 10,
+                            longBreakMinutes: data.data.settings.longBreakDuration ?? 20,
+                            accThreshold: data.data.settings.dailyFocusThreshold ?? 100,
+                        });
+                    }
                     fetchAccumulated(); // only makes sense if logged in
                 }
             })
-            .catch(err => console.error('Failed to get user:', err));
+            .catch(err => console.error('Failed to get user:', err))
+            .finally(() => setIsInitialLoad(false));
 
         fetch('/api/v1/tags')
             .then(res => res.json())
@@ -85,6 +95,12 @@ export function TimerWidget() {
         try {
             await fetch('/api/v1/auth/logout', { method: 'POST' });
             setUser(null);
+            setSettings({
+                workMinutes: 45,
+                shortBreakMinutes: 10,
+                longBreakMinutes: 20,
+                accThreshold: 100,
+            });
             router.refresh();
         } catch (err) {
             console.error('Logout failed', err);
@@ -150,8 +166,39 @@ export function TimerWidget() {
         setSettings(s => ({ ...s, [key]: val }));
     };
 
+    const saveSettings = async () => {
+        setShowSettings(false);
+        if (!user) return; // Only save to server if logged in
+
+        try {
+            await fetch('/api/v1/settings', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    workDuration: settings.workMinutes,
+                    shortBreakDuration: settings.shortBreakMinutes,
+                    longBreakDuration: settings.longBreakMinutes,
+                    dailyFocusThreshold: settings.accThreshold,
+                }),
+            });
+        } catch (err) {
+            console.error('Failed to save settings:', err);
+        }
+    };
+
+    if (isInitialLoad) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="flex items-center gap-2 animate-pulse">
+                    <div className="w-2 h-2 rounded-full bg-[#c8843a] shadow-[0_0_8px_#c8843a]" />
+                    <span className="font-serif text-lg italic tracking-[0.02em] text-[#e8e0d0]">DeepWork</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col items-center gap-8 justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-8 justify-center min-h-screen fade-in animate-in">
 
             {/* settings modal */}
             {showSettings && (
@@ -185,7 +232,7 @@ export function TimerWidget() {
                         ))}
 
                         <button
-                            onClick={() => setShowSettings(false)}
+                            onClick={saveSettings}
                             className="w-full mt-4 p-3 bg-[#c8843a] text-[#1a1208] rounded-md font-mono text-xs tracking-widest hover:opacity-85 transition-opacity"
                         >
                             SAVE (Takes effect next session)

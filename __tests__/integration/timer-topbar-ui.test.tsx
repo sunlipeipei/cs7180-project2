@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import React from 'react';
+import { TimerWidget } from '@/components/TimerWidget';
 
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
     useRouter: () => ({
         push: mockPush,
+        refresh: vi.fn(),
     }),
 }));
 
@@ -23,8 +25,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
             return Promise.resolve(new Response(JSON.stringify({ tags: [] }), { status: 200 }));
         });
 
-        const { TimerWidget } = await import('@/components/TimerWidget');
-        render(<TimerWidget />);
+        await act(async () => { render(<TimerWidget />); });
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/me');
@@ -38,7 +39,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
         expect(screen.queryByText('SIGN OUT')).not.toBeInTheDocument();
 
         // Clicking History when logged out should redirect to /auth
-        fireEvent.click(screen.getByText('History'));
+        await act(async () => { fireEvent.click(screen.getByText('History')); });
         expect(mockPush).toHaveBeenCalledWith('/auth');
     });
 
@@ -51,15 +52,14 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
             return Promise.resolve(new Response(JSON.stringify({ tags: [] }), { status: 200 }));
         });
 
-        const { TimerWidget } = await import('@/components/TimerWidget');
-        render(<TimerWidget />);
+        await act(async () => { render(<TimerWidget />); });
 
         await waitFor(() => {
             expect(screen.getByText('SIGN OUT')).toBeInTheDocument();
         });
 
         // Clicking History when logged in should go to /dashboard
-        fireEvent.click(screen.getByText('History'));
+        await act(async () => { fireEvent.click(screen.getByText('History')); });
         expect(mockPush).toHaveBeenCalledWith('/dashboard');
 
         // Avatar should contain 'T' (first letter of test@example.com)
@@ -77,14 +77,13 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
             return Promise.resolve(new Response(JSON.stringify({ tags: [] }), { status: 200 }));
         });
 
-        const { TimerWidget } = await import('@/components/TimerWidget');
-        render(<TimerWidget />);
+        await act(async () => { render(<TimerWidget />); });
 
         await waitFor(() => {
             expect(screen.getByText('SIGN OUT')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByText('SIGN OUT'));
+        await act(async () => { fireEvent.click(screen.getByText('SIGN OUT')); });
 
         // Should call the logout API
         await waitFor(() => {

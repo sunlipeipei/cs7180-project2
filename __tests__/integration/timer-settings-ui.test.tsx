@@ -27,17 +27,29 @@ vi.mock('@/hooks/useTimer', () => {
 describe('TimerWidget Settings UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
-        global.fetch = vi.fn().mockResolvedValue(
-            new Response(JSON.stringify({ tags: [] }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            }),
-        );
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/auth/me') {
+                return Promise.resolve(new Response(JSON.stringify({ data: { email: 'test@example.com', settings: { workDuration: 45, shortBreakDuration: 10, longBreakDuration: 20, dailyFocusThreshold: 100 } } }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
+        });
     });
 
     it('should open and close the settings modal', async () => {
         await act(async () => {
             render(<TimerWidget />);
+        });
+
+        // Wait for initial load to finish
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
         });
 
         // Click settings button
@@ -61,6 +73,10 @@ describe('TimerWidget Settings UI', () => {
     it('should allow changing the timer settings', async () => {
         await act(async () => {
             render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
         });
 
         const settingsBtn = screen.getByText('Settings');
@@ -97,5 +113,50 @@ describe('TimerWidget Settings UI', () => {
         await waitFor(() => {
             expect(screen.queryByText('Work Duration')).not.toBeInTheDocument();
         });
+    });
+
+    it('should call SAVE settings api correctly', async () => {
+        await act(async () => {
+            render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
+
+        const settingsBtn = screen.getByText('Settings');
+        fireEvent.click(settingsBtn);
+
+        const sliders = screen.getAllByRole('slider') as HTMLInputElement[];
+        fireEvent.change(sliders[0], { target: { value: '55' } });
+
+        const saveBtn = screen.getByText(/SAVE/);
+        await act(async () => {
+            fireEvent.click(saveBtn);
+        });
+
+        expect(global.fetch).toHaveBeenCalledWith('/api/v1/settings', expect.objectContaining({
+            method: 'PATCH',
+            body: expect.stringContaining('"workDuration":55')
+        }));
+    });
+
+    it('should handle Sign Out properly', async () => {
+        await act(async () => {
+            render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('SIGN OUT')).toBeInTheDocument();
+        });
+
+        const signOutBtn = screen.getByText('SIGN OUT');
+        await act(async () => {
+            fireEvent.click(signOutBtn);
+        });
+
+        expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/logout', expect.objectContaining({
+            method: 'POST'
+        }));
     });
 });
