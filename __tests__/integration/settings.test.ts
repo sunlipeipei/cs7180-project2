@@ -1,9 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import { getTestServer } from './server';
 import { Server } from 'http';
-import mongoose from 'mongoose';
-
 /**
  * Helper: register a user, log in, and return the cookie header string.
  */

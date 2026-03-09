@@ -93,8 +93,8 @@ describe('Settings UI Component', () => {
 
         await waitFor(() => {
             // Check that it's called with /api/v1/settings
-            const fetchCalls = (global.fetch as any).mock.calls;
-            const settingsCall = fetchCalls.find((call: any[]) => call[0] === '/api/v1/settings');
+            const fetchCalls = vi.mocked(global.fetch).mock.calls;
+            const settingsCall = fetchCalls.find(call => call[0] === '/api/v1/settings');
 
             expect(settingsCall).toBeDefined();
             expect(settingsCall[1].method).toBe('PATCH');

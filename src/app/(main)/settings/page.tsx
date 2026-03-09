@@ -49,7 +49,7 @@ export default function SettingsPage() {
             await updateSettings(formState);
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        } catch (err) {
+        } catch {
             setError('Failed to save settings. Please try again.');
         } finally {
             setSaving(false);

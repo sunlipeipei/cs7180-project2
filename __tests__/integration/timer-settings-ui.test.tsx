@@ -32,7 +32,7 @@ vi.mock('@/hooks/useTimer', () => {
 describe('TimerWidget Settings UI', () => {
     beforeEach(() => {
         vi.resetAllMocks();
-        (useAuth as any).mockReturnValue({
+        vi.mocked(useAuth).mockReturnValue({
             user: { email: 'test@example.com', name: 'Test', settings: { workDuration: 45, shortBreakDuration: 10, longBreakDuration: 20, dailyFocusThreshold: 100 } },
             loading: false,
             updateSettings: vi.fn(),

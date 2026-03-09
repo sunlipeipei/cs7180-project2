@@ -24,7 +24,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
     });
 
     it('renders a guest top bar when unauthenticated', async () => {
-        (useAuth as any).mockReturnValue({
+        vi.mocked(useAuth).mockReturnValue({
             user: null,
             loading: false,
             updateSettings: vi.fn(),
@@ -59,7 +59,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
     });
 
     it('renders an authenticated top bar when logged in', async () => {
-        (useAuth as any).mockReturnValue({
+        vi.mocked(useAuth).mockReturnValue({
             user: { email: 'test@example.com', name: 'Test' },
             loading: false,
             updateSettings: vi.fn(),
@@ -91,7 +91,7 @@ describe('TimerWidget Top Bar UI (Guest vs Auth)', () => {
 
     it('handles sign out correctly', async () => {
         const mockLogout = vi.fn().mockResolvedValue(undefined);
-        (useAuth as any).mockReturnValue({
+        vi.mocked(useAuth).mockReturnValue({
             user: { email: 'test@example.com', name: 'Test' },
             loading: false,
             updateSettings: vi.fn(),

@@ -14,7 +14,7 @@ export async function updateUserSettings(userId: string, updates: Record<string,
         userId,
         { $set: setQuery },
         { new: true, runValidators: true } // Return updated document
-    ).lean() as { _id: { toString(): string }; email: string; name?: string; settings?: any } | null;
+    ).lean() as { _id: { toString(): string }; email: string; name?: string; settings?: Record<string, number> } | null;
 
     if (!updatedUser) {
         throw new Error('User not found');

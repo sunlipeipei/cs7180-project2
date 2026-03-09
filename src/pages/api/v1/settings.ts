@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Perform validation
         const allowedKeys = ['workDuration', 'shortBreakDuration', 'longBreakDuration', 'dailyFocusThreshold'];
-        const validUpdates: any = {};
+        const validUpdates: Record<string, number> = {};
 
         for (const key of Object.keys(updates)) {
             if (!allowedKeys.includes(key)) {
@@ -41,8 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const updatedUser = await updateUserSettings(userId, validUpdates);
 
         return res.status(200).json({ user: updatedUser });
-    } catch (error: any) {
-        if (error.message === 'User not found') {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === 'User not found') {
             return res.status(404).json({ error: 'User not found' });
         }
         return res.status(500).json({ error: 'Internal Server Error' });

@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     await dbConnect();
 
-    const user = await User.findById(payload.sub).lean() as { _id: { toString(): string }; email: string; name?: string; settings?: any } | null;
+    const user = await User.findById(payload.sub).lean() as { _id: { toString(): string }; email: string; name?: string; settings?: Record<string, number> } | null;
     if (!user) {
         return res.status(401).json({ error: 'User not found' });
     }
