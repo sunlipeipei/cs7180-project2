@@ -94,7 +94,7 @@ trigger: always_on
 ## Code Quality
 
 - **Formatting & Linting:** You must adhere to ESLint and Prettier formatting standard rules. Code that does not pass linting cannot be merged.
-- **Code Coverage Minimum:** `70%` code coverage is strictly enforced.
+- **Code Coverage Minimum:** `80%` code coverage is strictly enforced.
 
 ## Testing Rules
 
