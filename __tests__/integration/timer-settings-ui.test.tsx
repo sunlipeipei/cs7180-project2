@@ -2,8 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
 
+const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
-    useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+    useRouter: () => ({ push: mockPush, refresh: vi.fn() }),
 }));
 import { TimerWidget } from '@/components/TimerWidget';
 
@@ -158,5 +159,74 @@ describe('TimerWidget Settings UI', () => {
         expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/logout', expect.objectContaining({
             method: 'POST'
         }));
+    });
+
+    it('should navigate to dashboard on History click when logged in', async () => {
+        mockPush.mockClear();
+
+        await act(async () => {
+            render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
+
+        const historyBtn = screen.getByText('History');
+        fireEvent.click(historyBtn);
+
+        expect(mockPush).toHaveBeenCalledWith('/dashboard');
+    });
+
+    it('should navigate to auth on History click when not logged in', async () => {
+        mockPush.mockClear();
+
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 401 }));
+        });
+
+        await act(async () => {
+            render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
+
+        const historyBtn = screen.getByText('History');
+        fireEvent.click(historyBtn);
+
+        expect(mockPush).toHaveBeenCalledWith('/auth');
+    });
+
+    it('should navigate to auth on SIGN IN click when not logged in', async () => {
+        mockPush.mockClear();
+
+        global.fetch = vi.fn().mockImplementation((url: string) => {
+            if (url === '/api/v1/tags') {
+                return Promise.resolve(new Response(JSON.stringify({ tags: [] }), {
+                    status: 200, headers: { 'Content-Type': 'application/json' },
+                }));
+            }
+            return Promise.resolve(new Response(JSON.stringify({}), { status: 401 }));
+        });
+
+        await act(async () => {
+            render(<TimerWidget />);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText('DeepWork')).not.toHaveClass('animate-pulse');
+        });
+
+        const signInBtn = screen.getByText('SIGN IN');
+        fireEvent.click(signInBtn);
+
+        expect(mockPush).toHaveBeenCalledWith('/auth');
     });
 });

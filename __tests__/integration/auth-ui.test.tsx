@@ -119,4 +119,173 @@ describe('AuthUI (AuthScreen Component)', () => {
             expect(mockPush).toHaveBeenCalledWith('/');
         });
     });
+
+    it('should show error when signup is missing name', async () => {
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('CREATE ACCOUNT'));
+
+        expect(screen.getByText('Please enter your name.')).toBeInTheDocument();
+    });
+
+    it('should handle API error gracefully', async () => {
+        // Mock a failed fetch response
+        global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 }));
+
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('SIGN IN'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+        });
+    });
+
+    it('should handle network error gracefully', async () => {
+        // Mock a network error
+        global.fetch = vi.fn().mockRejectedValue(new Error('Network Error'));
+
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('SIGN IN'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Network Error')).toBeInTheDocument();
+        });
+    });
+
+    it('should change input styles on signup focus and blur', async () => {
+        const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(React.createElement(AuthScreen, { onAuth: vi.fn(), onBack: vi.fn() }));
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        const nameInput = screen.getByPlaceholderText('Your name') as HTMLInputElement;
+
+        fireEvent.focus(nameInput);
+        expect(nameInput.style.borderColor).toBe('var(--amber-dim)');
+
+        fireEvent.blur(nameInput);
+        expect(nameInput.style.borderColor).toBe('var(--border)');
+    });
+
+    it('should submit successfully on signup', async () => {
+        const mockOnAuth = vi.fn();
+        global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
+
+        const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(React.createElement(AuthScreen, { onAuth: mockOnAuth, onBack: vi.fn() }));
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        fireEvent.change(screen.getByPlaceholderText('Your name'), { target: { value: 'Alice' } });
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'alice@example.com' } });
+    });
+
+    it('should show error when signup is missing name', async () => {
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('CREATE ACCOUNT'));
+
+        expect(screen.getByText('Please enter your name.')).toBeInTheDocument();
+    });
+
+    it('should handle API error gracefully', async () => {
+        // Mock a failed fetch response
+        global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 }));
+
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('SIGN IN'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Invalid credentials')).toBeInTheDocument();
+        });
+    });
+
+    it('should handle network error gracefully', async () => {
+        // Mock a network error
+        global.fetch = vi.fn().mockRejectedValue(new Error('Network Error'));
+
+        const { default: AuthScreen } = await import('@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(<AuthScreen onAuth={vi.fn()} onBack={vi.fn()} />);
+
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'user@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+        fireEvent.click(screen.getByText('SIGN IN'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Network Error')).toBeInTheDocument();
+        });
+    });
+
+    it('should change input styles on signup focus and blur', async () => {
+        const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(React.createElement(AuthScreen, { onAuth: vi.fn(), onBack: vi.fn() }));
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        const nameInput = screen.getByPlaceholderText('Your name') as HTMLInputElement;
+
+        fireEvent.focus(nameInput);
+        expect(nameInput.style.borderColor).toBe('var(--amber-dim)');
+
+        fireEvent.blur(nameInput);
+        expect(nameInput.style.borderColor).toBe('var(--border)');
+    });
+
+    it('should submit successfully on signup', async () => {
+        const mockOnAuth = vi.fn();
+        global.fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
+
+        const { default: AuthScreen } = await import(/* @vite-ignore */ '@/components/AuthScreen');
+        // @ts-expect-error -- dynamic import loses type info
+        render(React.createElement(AuthScreen, { onAuth: mockOnAuth, onBack: vi.fn() }));
+
+        // Switch to Signup
+        fireEvent.click(screen.getByText('signup'));
+
+        fireEvent.change(screen.getByPlaceholderText('Your name'), { target: { value: 'Alice' } });
+        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'alice@example.com' } });
+        fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass123' } });
+
+        fireEvent.click(screen.getByText('CREATE ACCOUNT'));
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/v1/auth/register', expect.any(Object));
+        });
+    });
 });
