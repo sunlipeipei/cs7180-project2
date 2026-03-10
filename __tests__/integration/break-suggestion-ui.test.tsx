@@ -56,4 +56,32 @@ describe('BreakSuggestion', () => {
         const suggestion = randomSuggestion();
         expect(BREAK_SUGGESTIONS).toContain(suggestion);
     });
+
+    it('changes button color on hover', () => {
+        render(
+            <BreakSuggestion
+                suggestion="Drink a full glass of water"
+                onDismiss={vi.fn()}
+                onRefresh={vi.fn()}
+            />
+        );
+
+        const dismissBtn = screen.getByLabelText('Dismiss');
+        const refreshBtn = screen.getByLabelText('Another suggestion');
+
+        // Initial state
+        expect(dismissBtn.style.color).toBe('#6a7a6a');
+
+        // Hover dismiss
+        fireEvent.mouseEnter(dismissBtn);
+        expect(dismissBtn.style.color).toBe('#9ab09a');
+        fireEvent.mouseLeave(dismissBtn);
+        expect(dismissBtn.style.color).toBe('#6a7a6a');
+
+        // Hover refresh
+        fireEvent.mouseEnter(refreshBtn);
+        expect(refreshBtn.style.color).toBe('#9ab09a');
+        fireEvent.mouseLeave(refreshBtn);
+        expect(refreshBtn.style.color).toBe('#6a7a6a');
+    });
 });

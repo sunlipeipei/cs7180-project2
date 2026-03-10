@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { hashPassword, verifyPassword, signJWT, verifyJWT } from '@/lib/auth';
-import * as crypto from 'crypto';
 
 describe('auth utilities', () => {
 
@@ -33,11 +32,11 @@ describe('auth utilities', () => {
             // for the sake of getting the other 90% of coverage, 
             // OR use a technique that works in vitest.
             // A simpler way to trigger an error is to pass invalid arguments
-            await expect(hashPassword(null as any)).rejects.toThrow();
+            await expect(hashPassword(null as unknown as string)).rejects.toThrow();
         });
 
         it('should handle scrypt errors in verifyPassword', async () => {
-            await expect(verifyPassword(null as any, 'salt:hash')).rejects.toThrow();
+            await expect(verifyPassword(null as unknown as string, 'salt:hash')).rejects.toThrow();
         });
     });
 
@@ -49,7 +48,7 @@ describe('auth utilities', () => {
         it('should sign and verify a token', () => {
             const payload = { userId: '123' };
             const token = signJWT(payload);
-            const decoded = verifyJWT(token) as any;
+            const decoded = verifyJWT(token) as { userId: string };
             expect(decoded.userId).toBe('123');
         });
 
