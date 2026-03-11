@@ -46,120 +46,87 @@ export default function AuthScreen({ onAuth, onBack }: { onAuth?: (user: { email
         }
     };
 
-    const inputStyle = {
-        width: '100%', padding: '11px 14px',
-        background: 'var(--surface)', border: '1px solid var(--border)',
-        borderRadius: 6, outline: 'none',
-        fontFamily: 'var(--mono)', fontSize: 14, color: 'var(--text)',
-        letterSpacing: '0.02em',
-        transition: 'border-color 0.2s',
-    };
+
 
     return (
-        <div style={{
-            minHeight: '100vh', display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            background: 'radial-gradient(ellipse 70% 60% at 50% 30%, #1a1710 0%, var(--bg) 70%)',
-            padding: 24, animation: 'fade-in 0.5s ease',
-        }}>
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[radial-gradient(ellipse_70%_60%_at_50%_30%,#1a1710_0%,var(--color-bg)_70%)] animate-[fade-in_0.5s_ease]">
             {/* wordmark */}
-            <div style={{ marginBottom: 48, textAlign: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 10 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--amber)', boxShadow: '0 0 12px var(--amber)' }} />
-                    <span style={{ fontFamily: 'var(--serif)', fontSize: 28, fontStyle: 'italic', color: 'var(--text)' }}>DeepWork</span>
+            <div className="mb-12 text-center">
+                <div className="flex items-center justify-center gap-2.5 mb-2.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber shadow-[0_0_12px_var(--color-amber)]" />
+                    <span className="font-serif text-2xl italic text-text">DeepWork</span>
                 </div>
-                <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+                <p className="font-sans text-xs text-text-muted tracking-[0.16em] uppercase">
                     Focus, logged.
                 </p>
             </div>
 
             {/* card */}
-            <div style={{
-                width: '100%', maxWidth: 360,
-                background: 'var(--bg2)', border: '1px solid var(--border)',
-                borderRadius: 12, padding: '32px 28px',
-            }}>
+            <div className="w-full max-w-[360px] bg-bg2/80 backdrop-blur-md border border-border rounded-xl p-7 shadow-2xl">
                 {/* tab switcher */}
-                <div style={{
-                    display: 'flex', gap: 2, marginBottom: 28,
-                    background: 'var(--surface)', border: '1px solid var(--border)',
-                    borderRadius: 6, padding: 3,
-                }}>
+                <div className="flex gap-0.5 mb-7 bg-surface border border-border rounded-md p-[3px]">
                     {(['login', 'signup'] as const).map(t => (
-                        <button key={t} onClick={() => { setTab(t); setError(''); }} style={{
-                            flex: 1, padding: '7px', borderRadius: 4, border: 'none', cursor: 'pointer',
-                            fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
-                            background: tab === t ? 'var(--amber)' : 'transparent',
-                            color: tab === t ? '#1a1208' : 'var(--text-muted)',
-                            transition: 'all 0.2s',
-                        }}>{t}</button>
+                        <button key={t} onClick={() => { setTab(t); setError(''); }} className={`flex-1 p-[7px] rounded text-center border-none cursor-pointer font-mono text-[11px] tracking-[0.12em] uppercase transition-all duration-200 ${tab === t ? 'bg-amber text-[#1a1208]' : 'bg-transparent text-text-muted hover:text-text-dim'}`}>
+                            {t}
+                        </button>
                     ))}
                 </div>
 
                 {/* fields */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div className="flex flex-col gap-3">
                     {tab === 'signup' && (
                         <input
                             placeholder="Your name"
                             value={name}
                             onChange={e => setName(e.target.value)}
-                            style={inputStyle}
                             onFocus={e => (e.currentTarget.style.borderColor = 'var(--amber-dim)')}
                             onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+                            className="w-full px-3.5 py-2.5 bg-surface border border-border rounded-md outline-none font-mono text-sm text-text tracking-[0.02em] transition-colors duration-200 focus:border-amber-dim placeholder:text-text-muted hover:border-border/80"
                         />
                     )}
                     <input
                         type="email" placeholder="Email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
-                        style={inputStyle}
                         onFocus={e => (e.currentTarget.style.borderColor = 'var(--amber-dim)')}
                         onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+                        className="w-full px-3.5 py-2.5 bg-surface border border-border rounded-md outline-none font-mono text-sm text-text tracking-[0.02em] transition-colors duration-200 focus:border-amber-dim placeholder:text-text-muted hover:border-border/80"
                     />
                     <input
                         type="password" placeholder="Password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                        style={inputStyle}
                         onFocus={e => (e.currentTarget.style.borderColor = 'var(--amber-dim)')}
                         onBlur={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+                        className="w-full px-3.5 py-2.5 bg-surface border border-border rounded-md outline-none font-mono text-sm text-text tracking-[0.02em] transition-colors duration-200 focus:border-amber-dim placeholder:text-text-muted hover:border-border/80"
                     />
                 </div>
 
                 {/* error */}
                 {error && (
-                    <p style={{ marginTop: 10, fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--red)', letterSpacing: '0.02em' }}>
+                    <p className="mt-2.5 font-sans text-xs text-red tracking-[0.02em] animate-[fade-in_0.2s_ease]">
                         {error}
                     </p>
                 )}
 
                 {/* submit */}
-                <button onClick={handleSubmit} disabled={loading} style={{
-                    width: '100%', marginTop: 20, padding: '12px',
-                    background: loading ? 'var(--amber-dim)' : 'var(--amber)',
-                    border: 'none', borderRadius: 6, cursor: loading ? 'default' : 'pointer',
-                    fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.14em',
-                    color: '#1a1208', transition: 'background 0.2s',
-                }}>
+                <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className={`w-full mt-5 p-3 rounded-md border-none font-mono text-xs tracking-[0.14em] transition-all duration-200 ${loading ? 'bg-amber-dim text-[#1a1208] cursor-default' : 'bg-amber text-[#1a1208] cursor-pointer hover:bg-amber/90 active:scale-[0.98]'}`}
+                >
                     {loading ? '…' : tab === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT'}
                 </button>
             </div>
 
-            <p style={{ marginTop: 24, fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
+            <p className="mt-6 font-sans text-[11px] text-text-muted tracking-[0.06em]">
                 Session history syncs across devices via JWT.
             </p>
             {onBack && (
                 <button
                     onClick={onBack}
-                    style={{
-                        marginTop: 16, background: 'none', border: 'none', cursor: 'pointer',
-                        fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-muted)',
-                        letterSpacing: '0.1em', textDecoration: 'underline',
-                        transition: 'color 0.2s',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-dim)')}
-                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+                    className="mt-4 bg-transparent border-none cursor-pointer font-mono text-[11px] text-text-muted tracking-[0.1em] underline transition-colors duration-200 hover:text-text-dim"
                 >
                     Continue without signing in →
                 </button>
