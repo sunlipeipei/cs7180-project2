@@ -14,7 +14,6 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
     const [running, setRunning] = useState(false);
     const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const endTimeRef = useRef<number | null>(null);
 
     const getTotalSeconds = useCallback(() => {
@@ -36,6 +35,8 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
         setSecondsLeft(null);
         endTimeRef.current = null;
         onSessionEnd(mode);
+        // Note: We deliberately DO NOT call switchMode here.
+        // DeepWork's philosophy is non-coercive transitions.
     }, [mode, onSessionEnd]);
 
     useEffect(() => {
@@ -58,23 +59,8 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
         return () => {
             clearInterval(intervalId);
         };
-    }, [running, handleSessionEnd]); 
-    // currentSeconds is used for initial endTimeRef calculation if needed.
-    // Note: If we use 100ms interval, re-running effect might be okay, 
-    // but ideally we only want to start the interval when running changes.
-    // If currentSeconds changes while running, we don't necessarily want to reset the interval.
+    }, [running, handleSessionEnd]);
 
-    // Let's refine the effect to avoid unnecessary restarts.
-    
-    /* 
-    Revised effect logic:
-    useEffect(() => {
-        if (!running) { ... }
-        if (!endTimeRef.current) { endTimeRef.current = Date.now() + (secondsLeft ?? totalSeconds) * 1000; }
-        const id = setInterval(() => { ... }, 100);
-        return () => clearInterval(id);
-    }, [running]); // Only depend on running
-    */
 
     const toggleTimer = () => {
         if (secondsLeft === 0) {
