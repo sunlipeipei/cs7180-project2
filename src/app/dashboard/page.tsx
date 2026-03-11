@@ -123,14 +123,14 @@ export default function DashboardPage() {
     };
 
     if (loading) return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text-dim)', letterSpacing: '0.1em' }}>Loading…</span>
+        <div className="min-h-screen bg-bg flex items-center justify-center">
+            <span className="font-mono text-xs text-text-dim tracking-[0.1em]">Loading…</span>
         </div>
     );
 
     if (error || !data) return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'var(--sans)', fontSize: 13, color: 'var(--red)' }}>{error ?? 'No data available.'}</span>
+        <div className="min-h-screen bg-bg flex items-center justify-center">
+            <span className="font-sans text-[13px] text-red">{error ?? 'No data available.'}</span>
         </div>
     );
 
@@ -178,55 +178,53 @@ export default function DashboardPage() {
     const maxTag = Math.max(...displayByTag.map(t => t.minutes), 1);
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '40px 24px', animation: 'fade-in 0.3s ease' }}>
-            <div style={{ maxWidth: 600, margin: '0 auto' }}>
+        <div className="min-h-screen bg-bg py-10 px-6 animate-[fade-in_0.3s_ease]">
+            <div className="max-w-[600px] mx-auto">
 
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 48 }}>
+                <div className="flex items-center gap-4 mb-12">
                     <button
                         onClick={() => router.push('/')}
-                        style={{ background: 'none', border: '1px solid var(--border)', color: 'var(--text-dim)', padding: '6px 14px', borderRadius: 4, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', transition: 'all 0.2s' }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--amber)'; e.currentTarget.style.color = 'var(--amber)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-dim)'; }}
+                        className="bg-transparent border border-border text-text-dim px-3.5 py-1.5 rounded-md cursor-pointer font-mono text-[11px] tracking-[0.1em] transition-all duration-200 hover:border-amber hover:text-amber"
                     >← back</button>
                     <div>
-                        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 28, fontWeight: 400, color: 'var(--text)' }}>Focus History</h1>
-                        <p style={{ fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--text-dim)', marginTop: 2, letterSpacing: '0.06em' }}>{TODAY}</p>
+                        <h1 className="font-serif text-[28px] font-normal text-text m-0 leading-tight">Focus History</h1>
+                        <p className="font-sans text-xs text-text-dim mt-0.5 tracking-[0.06em] m-0">{TODAY}</p>
                     </div>
                 </div>
 
                 {/* Stat cards — reactive to selected day */}
-                <div style={{ marginBottom: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                <div className="mb-2">
+                    <div className="flex items-center justify-between mb-3">
+                        <p className="font-sans text-[11px] text-text-dim tracking-[0.12em] uppercase m-0">
                             {statLabel}
                         </p>
                         {selectedDate && (
                             <button
                                 onClick={() => { setSelectedDate(null); setPage(1); }}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textDecoration: 'underline' }}
+                                className="bg-transparent border-none cursor-pointer font-mono text-[10px] text-text-muted tracking-[0.1em] underline"
                             >clear filter</button>
                         )}
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 40 }}>
+                    <div className="grid grid-cols-3 gap-3 mb-10">
                         {[
                             { label: 'Focus Time', value: fmtDuration(filteredMinutes) },
                             { label: 'Sessions', value: String(filteredCount) },
                             { label: 'Avg Session', value: filteredCount > 0 ? fmtDuration(filteredAvg) : '—' },
                         ].map(({ label, value }) => (
-                            <div key={label} style={{ background: 'var(--surface)', border: `1px solid ${selectedDate ? 'var(--amber-dim)' : 'var(--border)'}`, borderRadius: 8, padding: '16px 18px', transition: 'border-color 0.3s' }}>
-                                <p style={{ fontFamily: 'var(--sans)', fontSize: 10, color: 'var(--text-dim)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>{label}</p>
-                                <p style={{ fontFamily: 'var(--mono)', fontSize: 22, color: 'var(--amber)', fontWeight: 400 }}>{value}</p>
+                            <div key={label} className={`bg-surface border rounded-lg py-4 px-4 transition-colors duration-300 ${selectedDate ? 'border-amber-dim' : 'border-border'}`}>
+                                <p className="font-sans text-[10px] text-text-dim tracking-[0.14em] uppercase mb-2 m-0">{label}</p>
+                                <p className="font-mono text-[22px] text-amber font-normal m-0">{value}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* 7-day bar chart — clickable */}
-                <div style={{ marginBottom: 40 }}>
-                    <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>Last 7 Days</p>
-                    <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-muted)', marginBottom: 16, letterSpacing: '0.04em' }}>Click a day to filter</p>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 88 }}>
+                <div className="mb-10">
+                    <p className="font-sans text-[11px] text-text-dim tracking-[0.12em] uppercase mb-1.5 m-0">Last 7 Days</p>
+                    <p className="font-sans text-[11px] text-text-muted mb-4 tracking-[0.04em] m-0">Click a day to filter</p>
+                    <div className="flex items-end gap-2 h-[88px]">
                         {last7Days.map(({ label, minutes, date, count }) => {
                             const h = maxDay > 0 ? (minutes / maxDay) * 72 : 0;
                             const isToday = date === todayUTC;
@@ -236,24 +234,24 @@ export default function DashboardPage() {
                                 <div
                                     key={date}
                                     onClick={() => handleDayClick(date, hasData)}
-                                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: hasData ? 'pointer' : 'default' }}
+                                    className={`flex-1 flex flex-col items-center gap-1.5 ${hasData ? 'cursor-pointer' : 'cursor-default'}`}
                                 >
                                     {/* session count badge */}
-                                    <span style={{ fontFamily: 'var(--mono)', fontSize: 9, color: isSelected ? 'var(--amber)' : 'transparent', letterSpacing: '0.06em', height: 12 }}>
+                                    <span className={`font-mono text-[9px] tracking-[0.06em] h-3 ${isSelected ? 'text-amber' : 'text-transparent'}`}>
                                         {count > 0 ? count : ''}
                                     </span>
-                                    <div style={{ width: '100%', height: 72, display: 'flex', alignItems: 'flex-end' }}>
-                                        <div style={{
-                                            width: '100%',
-                                            height: `${Math.max(h, hasData ? 4 : 0)}px`,
-                                            background: isSelected ? 'var(--amber)' : isToday ? 'var(--amber-dim)' : 'var(--bg3)',
-                                            border: `1px solid ${isSelected ? 'var(--amber)' : isToday ? 'var(--amber-dim)' : 'var(--border)'}`,
-                                            borderRadius: '3px 3px 0 0',
-                                            transition: 'all 0.25s ease',
-                                            boxShadow: isSelected ? '0 0 14px var(--amber-glow)' : isToday ? '0 0 8px #8a5a2633' : 'none',
-                                        }} />
+                                    <div className="w-full h-[72px] flex items-end">
+                                        <div
+                                            style={{ height: `${Math.max(h, hasData ? 4 : 0)}px` }}
+                                            className={`w-full rounded-t-[3px] transition-all duration-300 ease-out border ${isSelected
+                                                    ? 'bg-amber border-amber shadow-[0_0_14px_var(--color-amber-glow)]'
+                                                    : isToday
+                                                        ? 'bg-amber-dim border-amber-dim shadow-[0_0_8px_#8a5a2633]'
+                                                        : 'bg-bg3 border-border shadow-none'
+                                                }`}
+                                        />
                                     </div>
-                                    <span style={{ fontFamily: 'var(--mono)', fontSize: 9, color: isSelected ? 'var(--amber)' : isToday ? 'var(--amber-dim)' : 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                                    <span className={`font-mono text-[9px] tracking-[0.08em] ${isSelected ? 'text-amber' : isToday ? 'text-amber-dim' : 'text-text-muted'}`}>
                                         {label}
                                     </span>
                                 </div>
@@ -264,19 +262,22 @@ export default function DashboardPage() {
 
                 {/* Time by Project — scoped to filter */}
                 {displayByTag.length > 0 && (
-                    <div style={{ marginBottom: 40 }}>
-                        <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 16 }}>
+                    <div className="mb-10">
+                        <p className="font-sans text-[11px] text-text-dim tracking-[0.12em] uppercase mb-4 m-0">
                             Time by Project {selectedDate && selectedDay ? `· ${statLabel}` : ''}
                         </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div className="flex flex-col gap-2.5">
                             {displayByTag.map(({ tag, minutes }) => (
                                 <div key={tag}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                                        <span style={{ fontFamily: 'var(--sans)', fontSize: 13, color: 'var(--text)' }}>{tag}</span>
-                                        <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--text-dim)' }}>{fmtDuration(minutes)}</span>
+                                    <div className="flex justify-between mb-1">
+                                        <span className="font-sans text-[13px] text-text">{tag}</span>
+                                        <span className="font-mono text-[12px] text-text-dim">{fmtDuration(minutes)}</span>
                                     </div>
-                                    <div style={{ height: 3, background: 'var(--surface)', borderRadius: 2, overflow: 'hidden' }}>
-                                        <div style={{ height: '100%', width: `${(minutes / maxTag) * 100}%`, background: 'linear-gradient(90deg, var(--amber-dim), var(--amber))', borderRadius: 2, transition: 'width 0.5s ease' }} />
+                                    <div className="h-[3px] bg-surface rounded-[2px] overflow-hidden">
+                                        <div
+                                            style={{ width: `${(minutes / maxTag) * 100}%` }}
+                                            className="h-full bg-gradient-to-r from-amber-dim to-amber rounded-[2px] transition-[width] duration-500 ease-out"
+                                        />
                                     </div>
                                 </div>
                             ))}
@@ -286,23 +287,23 @@ export default function DashboardPage() {
 
                 {/* Session Log with pagination */}
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                        <p style={{ fontFamily: 'var(--sans)', fontSize: 11, color: 'var(--text-dim)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Session Log</p>
-                        <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-muted)' }}>
+                    <div className="flex items-center justify-between mb-4">
+                        <p className="font-sans text-[11px] text-text-dim tracking-[0.12em] uppercase m-0">Session Log</p>
+                        <span className="font-mono text-[11px] text-text-muted">
                             {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''}
                             {selectedDate && selectedDay ? ` · ${statLabel}` : ''}
                         </span>
                     </div>
 
                     {pagedSessions.length === 0 ? (
-                        <p style={{ fontFamily: 'var(--sans)', fontSize: 13, color: 'var(--text-muted)', padding: '20px 0', letterSpacing: '0.04em' }}>
+                        <p className="font-sans text-[13px] text-text-muted py-5 tracking-[0.04em] m-0">
                             No sessions recorded for this day.
                         </p>
                     ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <div className="flex flex-col gap-[1px]">
                             {pagedSessions.map(s => (
-                                <div key={s._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 0', borderBottom: '1px solid var(--border)', animation: 'fade-in 0.25s ease' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                                <div key={s._id} className="flex justify-between items-center py-[13px] border-b border-border animate-[fade-in_0.25s_ease]">
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
                                         {editingId === s._id ? (
                                             <input
                                                 autoFocus
@@ -314,25 +315,25 @@ export default function DashboardPage() {
                                                     if (e.key === 'Enter') saveTag(s._id);
                                                     if (e.key === 'Escape') setEditingId(null);
                                                 }}
-                                                style={{ background: 'var(--surface)', border: '1px solid var(--amber)', borderRadius: 4, padding: '2px 8px', fontFamily: 'var(--sans)', fontSize: 13, color: 'var(--text)', outline: 'none', width: '100%', maxWidth: 220 }}
+                                                className="bg-surface border border-amber rounded-[4px] px-2 py-0.5 font-sans text-[13px] text-text outline-none w-full max-w-[220px]"
                                             />
                                         ) : (
                                             <button
                                                 onClick={() => { setEditingId(s._id); setEditingTag(s.tag ?? ''); }}
                                                 title="Click to edit tag"
-                                                style={{ background: 'none', border: 'none', cursor: 'text', fontFamily: 'var(--sans)', fontSize: 13, color: s.tag ? 'var(--text)' : 'var(--text-muted)', padding: 0, textAlign: 'left' }}
+                                                className={`bg-transparent border-none cursor-text font-sans text-[13px] p-0 text-left ${s.tag ? 'text-text' : 'text-text-muted'}`}
                                             >
                                                 {s.tag ?? 'Untitled Session'}
                                             </button>
                                         )}
-                                        <span style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>
+                                        <span className="font-mono text-[10px] text-text-muted shrink-0">
                                             {selectedDate
                                                 ? new Date(s.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
                                                 : new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                                             }
                                         </span>
                                     </div>
-                                    <span style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--amber)', flexShrink: 0, marginLeft: 12 }}>
+                                    <span className="font-mono text-[13px] text-amber shrink-0 ml-3">
                                         {fmtDuration(Math.round(s.duration / 60))}
                                     </span>
                                 </div>
@@ -342,21 +343,19 @@ export default function DashboardPage() {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+                        <div className="flex items-center justify-between mt-5">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
-                                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 4, padding: '6px 16px', cursor: page === 1 ? 'default' : 'pointer', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', color: page === 1 ? 'var(--text-muted)' : 'var(--text-dim)', opacity: page === 1 ? 0.4 : 1, transition: 'all 0.2s' }}
-                                onMouseEnter={e => { if (page !== 1) e.currentTarget.style.borderColor = 'var(--amber)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                                className="bg-transparent border border-border rounded-[4px] px-4 py-1.5 font-mono text-[11px] tracking-[0.1em] transition-all duration-200 hover:border-amber disabled:opacity-40 disabled:hover:border-border disabled:cursor-default"
                             >← prev</button>
 
-                            <div style={{ display: 'flex', gap: 6 }}>
+                            <div className="flex gap-1.5">
                                 {Array.from({ length: totalPages }).map((_, i) => (
                                     <button
                                         key={i}
                                         onClick={() => setPage(i + 1)}
-                                        style={{ width: 28, height: 28, borderRadius: 4, border: 'none', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 11, background: page === i + 1 ? 'var(--amber)' : 'var(--surface)', color: page === i + 1 ? '#1a1208' : 'var(--text-dim)', transition: 'all 0.2s' }}
+                                        className={`w-7 h-7 rounded-[4px] border-none cursor-pointer font-mono text-[11px] transition-all duration-200 ${page === i + 1 ? 'bg-amber text-[#1a1208]' : 'bg-surface text-text-dim hover:bg-surface/80'}`}
                                     >{i + 1}</button>
                                 ))}
                             </div>
@@ -364,9 +363,7 @@ export default function DashboardPage() {
                             <button
                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                 disabled={page === totalPages}
-                                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 4, padding: '6px 16px', cursor: page === totalPages ? 'default' : 'pointer', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', color: page === totalPages ? 'var(--text-muted)' : 'var(--text-dim)', opacity: page === totalPages ? 0.4 : 1, transition: 'all 0.2s' }}
-                                onMouseEnter={e => { if (page !== totalPages) e.currentTarget.style.borderColor = 'var(--amber)'; }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                                className="bg-transparent border border-border rounded-[4px] px-4 py-1.5 font-mono text-[11px] tracking-[0.1em] transition-all duration-200 hover:border-amber disabled:opacity-40 disabled:hover:border-border disabled:cursor-default"
                             >next →</button>
                         </div>
                     )}

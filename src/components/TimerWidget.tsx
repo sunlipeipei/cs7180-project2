@@ -190,8 +190,8 @@ export function TimerWidget() {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen">
                 <div className="flex items-center gap-2 animate-pulse">
-                    <div className="w-2 h-2 rounded-full bg-[#c8843a] shadow-[0_0_8px_#c8843a]" />
-                    <span className="font-serif text-lg italic tracking-[0.02em] text-[#e8e0d0]">DeepWork</span>
+                    <div className="w-2 h-2 rounded-full bg-amber shadow-[0_0_8px_var(--color-amber)]" />
+                    <span className="font-serif text-lg italic tracking-[0.02em] text-text">DeepWork</span>
                 </div>
             </div>
         );
@@ -203,14 +203,14 @@ export function TimerWidget() {
             {/* settings modal */}
             {showSettings && (
                 <div
-                    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center animate-in fade-in"
                     onClick={() => setShowSettings(false)}
                 >
                     <div
-                        className="bg-[#141210] border border-[#2e2b25] rounded-xl p-8 w-80 shadow-2xl"
+                        className="bg-bg2/90 backdrop-blur-xl border border-border rounded-xl p-8 w-80 shadow-2xl"
                         onClick={e => e.stopPropagation()}
                     >
-                        <h2 className="font-serif text-2xl mb-6 text-[#e8e0d0]">Settings</h2>
+                        <h2 className="font-serif text-2xl mb-6 text-text">Settings</h2>
 
                         {([
                             { label: 'Work Duration', key: 'workMinutes', unit: 'min', min: 1, max: 120 },
@@ -220,20 +220,20 @@ export function TimerWidget() {
                         ] as const).map(({ label, key, unit, min, max }) => (
                             <div key={key} className="mb-5">
                                 <div className="flex justify-between mb-2">
-                                    <label className="text-sm text-[#7a7060]">{label}</label>
-                                    <span className="font-mono text-sm text-[#c8843a]">{settings[key]} {unit}</span>
+                                    <label className="text-sm text-text-dim">{label}</label>
+                                    <span className="font-mono text-sm text-amber">{settings[key]} {unit}</span>
                                 </div>
                                 <input
                                     type="range" min={min} max={max} value={settings[key]}
                                     onChange={e => changeSetting(key, +e.target.value)}
-                                    className="w-full accent-[#c8843a] h-1 cursor-pointer"
+                                    className="w-full accent-amber h-1 cursor-pointer"
                                 />
                             </div>
                         ))}
 
                         <button
                             onClick={saveSettings}
-                            className="w-full mt-4 p-3 bg-[#c8843a] text-[#1a1208] rounded-md font-mono text-xs tracking-widest hover:opacity-85 transition-opacity"
+                            className="w-full mt-4 p-3 bg-amber text-[#1a1208] rounded-md font-mono text-xs tracking-widest hover:bg-amber/90 transition-colors"
                         >
                             SAVE (Takes effect next session)
                         </button>
@@ -243,16 +243,16 @@ export function TimerWidget() {
 
             {/* notification toast */}
             {notification && (
-                <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-[#222019] border border-[#2e2b25] rounded-md px-5 py-3 text-sm text-[#7a7060] z-50 animate-in slide-in-from-top-4">
+                <div className="fixed top-5 left-1/2 -translate-x-1/2 bg-surface/90 backdrop-blur-sm border border-border rounded-md px-5 py-3 text-sm text-text-dim z-50 animate-in slide-in-from-top-4 shadow-lg">
                     {notification}
                 </div>
             )}
 
             {/* top bar controls */}
-            <div className="fixed top-0 left-0 right-0 py-4 px-6 flex items-center justify-between border-b border-[#2e2b25] bg-[#0e0d0b]/80 backdrop-blur-md z-30">
+            <div className="fixed top-0 left-0 right-0 py-4 px-6 flex items-center justify-between border-b border-border bg-bg/80 backdrop-blur-md z-30 transition-colors duration-300">
                 <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full bg-[#c8843a] ${running ? 'animate-pulse shadow-[0_0_8px_#c8843a]' : ''}`} />
-                    <span className="font-serif text-lg italic tracking-[0.02em] text-[#e8e0d0]">DeepWork</span>
+                    <div className={`w-2 h-2 rounded-full bg-amber ${running ? 'animate-pulse shadow-[0_0_8px_var(--color-amber)]' : ''}`} />
+                    <span className="font-serif text-lg italic tracking-[0.02em] text-text">DeepWork</span>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -261,27 +261,27 @@ export function TimerWidget() {
                             if (user) router.push('/dashboard');
                             else router.push('/auth');
                         }}
-                        className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-[0.1em] transition-colors"
+                        className="text-text-dim hover:text-text font-mono text-xs tracking-[0.1em] transition-colors"
                     >
                         History
                     </button>
                     <button
                         onClick={() => setShowSettings(true)}
-                        className="text-[#7a7060] hover:text-[#e8e0d0] font-mono text-xs tracking-[0.1em] transition-colors"
+                        className="text-text-dim hover:text-text font-mono text-xs tracking-[0.1em] transition-colors"
                     >
                         Settings
                     </button>
 
-                    <div className="w-[1px] h-3.5 bg-[#2e2b25] mx-1" />
+                    <div className="w-[1px] h-3.5 bg-border mx-1" />
 
                     {user ? (
-                        <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-[#8a5a26] border border-[#c8843a] flex items-center justify-center font-mono text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
+                        <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-amber-dim border border-amber flex items-center justify-center font-mono text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
                                 {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="text-[#c8843a] hover:opacity-80 font-mono text-[10px] tracking-[0.15em] transition-opacity"
+                                className="text-amber hover:text-amber/80 font-mono text-[10px] tracking-[0.15em] transition-colors"
                             >
                                 SIGN OUT
                             </button>
@@ -289,7 +289,7 @@ export function TimerWidget() {
                     ) : (
                         <button
                             onClick={() => router.push('/auth')}
-                            className="bg-[#c8843a] text-[#141210] px-4 py-1.5 rounded-md font-mono text-[10px] tracking-[0.15em] hover:opacity-85 transition-opacity"
+                            className="bg-amber text-[#141210] px-4 py-1.5 rounded-md font-mono text-[10px] tracking-[0.15em] hover:bg-amber/90 transition-colors"
                         >
                             SIGN IN
                         </button>
@@ -308,11 +308,11 @@ export function TimerWidget() {
                 />
                 <div className="absolute flex flex-col items-center justify-center">
                     <div className="flex items-baseline gap-1 mt-4">
-                        <span className="font-mono text-7xl font-light text-[#e8e0d0] tracking-tighter leading-none">{m}</span>
-                        <span className={`font-mono text-7xl font-light text-[#7a7060] leading-none ${running ? 'animate-pulse' : ''}`}>:</span>
-                        <span className="font-mono text-7xl font-light text-[#e8e0d0] tracking-tighter leading-none">{sec}</span>
+                        <span className="font-mono text-7xl font-light text-text tracking-tighter leading-none">{m}</span>
+                        <span className={`font-mono text-7xl font-light text-text-dim leading-none ${running ? 'animate-pulse' : ''}`}>:</span>
+                        <span className="font-mono text-7xl font-light text-text tracking-tighter leading-none">{sec}</span>
                     </div>
-                    <span className={`text-xs tracking-[0.2em] uppercase mt-4 ${mode !== 'focus' ? 'text-[#6a9a6a]' : 'text-[#8a5a26]'}`}>
+                    <span className={`text-xs tracking-[0.2em] uppercase mt-4 ${mode !== 'focus' ? 'text-green' : 'text-amber-dim'}`}>
                         {mode === 'focus' ? 'deep focus' : 'resting'}
                     </span>
                 </div>
@@ -322,23 +322,23 @@ export function TimerWidget() {
                 <button
                     onClick={toggleTimer}
                     className={`px-8 py-3 rounded-md font-mono text-xs tracking-widest border transition-all ${mode !== 'focus'
-                        ? 'border-[#6a9a6a] text-[#1a1208] bg-[#6a9a6a]'
-                        : 'border-[#c8843a] text-[#1a1208] bg-[#c8843a]'
+                        ? 'border-green text-[#1a1208] bg-green'
+                        : 'border-amber text-[#1a1208] bg-amber'
                         } hover:bg-transparent hover:text-white`}
                 >
                     {running ? 'PAUSE' : 'START'}
                 </button>
                 <button
                     onClick={resetTimer}
-                    className="px-8 py-3 rounded-md font-mono text-xs tracking-widest border border-[#2e2b25] text-[#7a7060] hover:text-[#e8e0d0]"
+                    className="px-8 py-3 rounded-md font-mono text-xs tracking-widest border border-border text-text-dim hover:text-text hover:border-text-dim transition-colors"
                 >
                     RESET
                 </button>
                 <button
                     onClick={toggleFocusBreak}
                     className={`px-8 py-3 rounded-md font-mono text-xs tracking-widest border transition-all ${mode !== 'focus'
-                        ? 'bg-[#1a2e1a] border-[#6a9a6a] text-[#9ab09a]'
-                        : 'border-[#2e2b25] text-[#7a7060] hover:text-[#9ab09a]'
+                        ? 'bg-green/10 border-green text-green/80 hover:bg-green/20'
+                        : 'border-border text-text-dim hover:text-green/80 hover:border-green/50 hover:bg-green/5'
                         }`}
                 >
                     {mode === 'focus' ? 'BREAK' : 'FOCUS'}
@@ -364,8 +364,8 @@ export function TimerWidget() {
             {/* Tag autocomplete input */}
             {mode === 'focus' && (
                 <div className="relative w-full max-w-[320px] z-10" ref={dropdownRef}>
-                    <div className="flex items-center gap-2 bg-[#222019] border border-[#2e2b25] rounded-md px-3 py-2">
-                        <span className="text-[#7a7060] text-xs">⬡</span>
+                    <div className="flex items-center gap-2 bg-surface border border-border rounded-md px-3 py-2 transition-colors duration-200 focus-within:border-amber/50">
+                        <span className="text-text-dim text-xs">⬡</span>
                         <input
                             type="text"
                             placeholder="Tag this session…"
@@ -376,20 +376,20 @@ export function TimerWidget() {
                             }}
                             onFocus={() => setShowSuggestions(true)}
                             disabled={running}
-                            className={`w-full bg-transparent border-none outline-none font-sans text-[13px] text-[#e8e0d0] tracking-[0.02em] transition-colors
-                                placeholder:text-[#5a5040] ${running ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`w-full bg-transparent border-none outline-none font-sans text-[13px] text-text tracking-[0.02em] transition-colors
+                                placeholder:text-text-muted ${running ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     </div>
 
                     {showSuggestions && !running && (
-                        <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-[#1c1916] border border-[#2e2b25] rounded-md overflow-hidden z-10 shadow-xl">
+                        <div className="absolute top-[calc(100%+4px)] left-0 right-0 bg-bg3 border border-border rounded-md overflow-hidden z-10 shadow-xl backdrop-blur-md">
                             {tagSuggestions
                                 .filter(t => t._id.toLowerCase().includes(sessionTag.toLowerCase()) && t._id !== sessionTag)
                                 .slice(0, 5)
                                 .map(tag => (
                                     <button
                                         key={tag._id}
-                                        className="w-full text-left px-3 py-2 font-sans text-[13px] text-[#7a7060] hover:bg-[#222019] transition-colors flex justify-between cursor-pointer"
+                                        className="w-full text-left px-3 py-2 font-sans text-[13px] text-text-dim hover:text-text hover:bg-surface border-none transition-colors flex justify-between cursor-pointer"
                                         onClick={() => {
                                             setSessionTag(tag._id);
                                             setShowSuggestions(false);

@@ -46,30 +46,48 @@ export default function SessionList() {
     }, [page]);
 
     return (
-        <div>
+        <div className="w-full">
             {loading ? (
-                <p>Loading...</p>
+                <p className="font-mono text-xs text-text-dim tracking-widest text-center py-4">Loading...</p>
             ) : error ? (
-                <p>Failed to load sessions.</p>
+                <p className="font-sans text-sm text-red text-center py-4">Failed to load sessions.</p>
             ) : sessions.length === 0 ? (
-                <p>No sessions</p>
+                <p className="font-sans text-sm text-text-muted text-center py-4 tracking-[0.04em]">No sessions</p>
             ) : (
-                <ul>
+                <ul className="flex flex-col gap-1 p-0 m-0 list-none">
                     {sessions.map(s => (
-                        <li key={s._id}>
-                            {s.duration} — {s.mode}
+                        <li key={s._id} className="flex justify-between items-center py-3 border-b border-border animate-[fade-in_0.25s_ease]">
+                            <span className="sr-only">{s.duration} — {s.mode}</span>
+                            <span className="font-sans text-[13px] text-text capitalize" aria-hidden="true">{s.mode.replace(/([A-Z])/g, ' $1').trim()}</span>
+                            <span className="font-mono text-[13px] text-amber" aria-hidden="true">{Math.round(s.duration / 60)} min</span>
                         </li>
                     ))}
                 </ul>
             )}
-            <div>
-                <button onClick={() => setPage(p => p - 1)} disabled={page <= 1}>
-                    Previous
-                </button>
-                <button onClick={() => setPage(p => p + 1)} disabled={pagination.totalPages === 0 || page >= pagination.totalPages}>
-                    Next
-                </button>
-            </div>
+
+            {pagination.page && (
+                <div className="flex items-center justify-between mt-5">
+                    <button
+                        onClick={() => setPage(p => p - 1)}
+                        disabled={page <= 1}
+                        className="px-4 py-1.5 rounded border border-border bg-transparent font-mono text-[11px] tracking-[0.1em] text-text-dim hover:text-text hover:border-amber disabled:opacity-40 disabled:hover:border-border disabled:cursor-not-allowed transition-all"
+                    >
+                        <span className="sr-only">Previous</span>
+                        <span aria-hidden="true">← prev</span>
+                    </button>
+                    <span className="font-mono text-[10px] text-text-muted tracking-widest">
+                        {page} / {pagination.totalPages}
+                    </span>
+                    <button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={pagination.totalPages === 0 || page >= pagination.totalPages}
+                        className="px-4 py-1.5 rounded border border-border bg-transparent font-mono text-[11px] tracking-[0.1em] text-text-dim hover:text-text hover:border-amber disabled:opacity-40 disabled:hover:border-border disabled:cursor-not-allowed transition-all"
+                    >
+                        <span className="sr-only">Next</span>
+                        <span aria-hidden="true">next →</span>
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
