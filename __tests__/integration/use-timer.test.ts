@@ -141,4 +141,35 @@ describe('useTimer', () => {
         act(() => { vi.advanceTimersByTime(1000); });
         expect(result.current.progress).toBeGreaterThan(0);
     });
+
+    it('handles background throttling by using absolute time', () => {
+        const { result } = renderHook(() =>
+            useTimer(defaultSettings, 0, vi.fn())
+        );
+
+        // Start at a known time
+        const startTime = new Date('2024-01-01T12:00:00Z').getTime();
+        vi.setSystemTime(startTime);
+
+        act(() => {
+            result.current.toggleTimer();
+        });
+
+        // Simulate background throttling:
+        // 1. Jump system time forward by 5 minutes (300,000 ms)
+        vi.setSystemTime(startTime + 300000);
+
+        // 2. Trigger the next interval tick (which usually happens every 1000ms)
+        // vi.advanceTimersByTime(1000) will trigger the interval if it's due.
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+
+        // If it's correctly using absolute time, it should have decreased by 301 seconds
+        // (300 seconds jump + 1 second from advanceTimersByTime)
+        // Initial workMinutes: 45 -> 2700 seconds
+        // Expected: 2700 - 301 = 2399
+        const expectedSecondsLeft = (defaultSettings.workMinutes * 60) - 301;
+        expect(result.current.secondsLeft).toBe(expectedSecondsLeft);
+    });
 });

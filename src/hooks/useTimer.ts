@@ -15,6 +15,7 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
     const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const endTimeRef = useRef<number | null>(null);
 
     const getTotalSeconds = useCallback(() => {
         if (mode === 'focus') {
@@ -33,61 +34,82 @@ export function useTimer(settings: TimerSettings, accMinutes: number, onSessionE
     const handleSessionEnd = useCallback(() => {
         setRunning(false);
         setSecondsLeft(null);
+        endTimeRef.current = null;
         onSessionEnd(mode);
-        // Note: We deliberately DO NOT call switchMode here.
-        // DeepWork's philosophy is non-coercive transitions.
     }, [mode, onSessionEnd]);
 
     useEffect(() => {
-        if (!running) {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+        if (!running || !endTimeRef.current) {
             return;
         }
 
-        intervalRef.current = setInterval(() => {
-            setSecondsLeft((prev) => {
-                const next = (prev ?? totalSeconds) - 1;
-                if (next <= 0) {
-                    if (intervalRef.current) clearInterval(intervalRef.current);
-                    handleSessionEnd();
-                    return 0;
-                }
-                return next;
-            });
-        }, 1000);
+        const intervalId = setInterval(() => {
+            const now = Date.now();
+            const next = Math.max(0, Math.ceil((endTimeRef.current! - now) / 1000));
+            
+            if (next <= 0) {
+                setSecondsLeft(0);
+                handleSessionEnd();
+            } else {
+                setSecondsLeft(next);
+            }
+        }, 100);
 
         return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            clearInterval(intervalId);
         };
-    }, [running, totalSeconds, handleSessionEnd]);
+    }, [running, handleSessionEnd]); 
+    // currentSeconds is used for initial endTimeRef calculation if needed.
+    // Note: If we use 100ms interval, re-running effect might be okay, 
+    // but ideally we only want to start the interval when running changes.
+    // If currentSeconds changes while running, we don't necessarily want to reset the interval.
+
+    // Let's refine the effect to avoid unnecessary restarts.
+    
+    /* 
+    Revised effect logic:
+    useEffect(() => {
+        if (!running) { ... }
+        if (!endTimeRef.current) { endTimeRef.current = Date.now() + (secondsLeft ?? totalSeconds) * 1000; }
+        const id = setInterval(() => { ... }, 100);
+        return () => clearInterval(id);
+    }, [running]); // Only depend on running
+    */
 
     const toggleTimer = () => {
         if (secondsLeft === 0) {
             setSecondsLeft(null);
+            endTimeRef.current = Date.now() + totalSeconds * 1000;
             setRunning(true);
             return;
         }
-        setRunning((r) => !r);
+        
+        setRunning((r) => {
+            const next = !r;
+            if (next) {
+                endTimeRef.current = Date.now() + currentSeconds * 1000;
+            } else {
+                endTimeRef.current = null;
+            }
+            return next;
+        });
     };
 
     const resetTimer = () => {
         setRunning(false);
         setSecondsLeft(null);
+        endTimeRef.current = null;
     };
 
     const switchMode = (newMode: TimerMode) => {
         setRunning(false);
         setMode(newMode);
         setSecondsLeft(null);
+        endTimeRef.current = null;
     };
 
     const toggleFocusBreak = () => {
         if (mode === 'focus') {
-            // Determine which break to take based on accumulated threshold
             if (accMinutes >= settings.accThreshold) {
                 switchMode('longBreak');
             } else {
