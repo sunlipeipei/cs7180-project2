@@ -249,39 +249,43 @@ export function TimerWidget() {
             )}
 
             {/* top bar controls */}
-            <div className="fixed top-0 left-0 right-0 py-4 px-6 flex items-center justify-between border-b border-border bg-bg/80 backdrop-blur-md z-30 transition-colors duration-300">
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full bg-amber ${running ? 'animate-pulse shadow-[0_0_8px_var(--color-amber)]' : ''}`} />
-                    <span className="font-serif text-lg italic tracking-[0.02em] text-text">DeepWork</span>
+            {/* top bar controls */}
+            <div
+                className="fixed top-0 left-0 right-0 px-4 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between border-b border-border bg-bg/80 backdrop-blur-md z-30 transition-colors duration-300"
+                style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+            >
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber ${running ? 'animate-pulse shadow-[0_0_8px_var(--color-amber)]' : ''}`} />
+                    <span className="font-serif text-base sm:text-lg italic tracking-[0.02em] text-text mt-0.5">DeepWork</span>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2.5 sm:gap-4">
                     <button
                         onClick={() => {
                             if (user) router.push('/dashboard');
                             else router.push('/auth');
                         }}
-                        className="text-text-dim hover:text-text font-mono text-xs tracking-[0.1em] transition-colors"
+                        className="text-text-dim hover:text-text font-mono text-[10px] sm:text-xs tracking-[0.1em] transition-colors"
                     >
                         History
                     </button>
                     <button
                         onClick={() => setShowSettings(true)}
-                        className="text-text-dim hover:text-text font-mono text-xs tracking-[0.1em] transition-colors"
+                        className="text-text-dim hover:text-text font-mono text-[10px] sm:text-xs tracking-[0.1em] transition-colors"
                     >
                         Settings
                     </button>
 
-                    <div className="w-[1px] h-3.5 bg-border mx-1" />
+                    <div className="w-[1px] h-3.5 bg-border mx-0.5 sm:mx-1" />
 
                     {user ? (
-                        <div className="flex items-center gap-3">
-                            <div className="w-7 h-7 rounded-full bg-amber-dim border border-amber flex items-center justify-center font-mono text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-amber-dim border border-amber flex items-center justify-center font-mono text-xs sm:text-sm text-[#141210] font-medium leading-none m-0 p-0 mb-[1px]">
                                 {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="text-amber hover:text-amber/80 font-mono text-[10px] tracking-[0.15em] transition-colors"
+                                className="text-amber hover:text-amber/80 font-mono text-[9px] sm:text-[10px] tracking-[0.15em] transition-colors"
                             >
                                 SIGN OUT
                             </button>
@@ -289,7 +293,7 @@ export function TimerWidget() {
                     ) : (
                         <button
                             onClick={() => router.push('/auth')}
-                            className="bg-amber text-[#141210] px-4 py-1.5 rounded-md font-mono text-[10px] tracking-[0.15em] hover:bg-amber/90 transition-colors"
+                            className="bg-amber text-[#141210] px-3 sm:px-4 py-1 sm:py-1.5 rounded-md font-mono text-[9px] sm:text-[10px] tracking-[0.15em] hover:bg-amber/90 transition-colors"
                         >
                             SIGN IN
                         </button>
